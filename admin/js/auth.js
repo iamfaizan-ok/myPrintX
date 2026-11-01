@@ -37,9 +37,7 @@ const AdminAuth = (function() {
 
   function requireAdminAuth() {
     if (!isAuthenticated()) {
-      const isPages = window.location.pathname.includes('/pages/');
-      const loginUrl = isPages ? 'login.html' : 'pages/login.html';
-      window.location.href = loginUrl;
+      window.location.href = '/admin/pages/login.html';
       return false;
     }
     return true;
@@ -52,8 +50,7 @@ const AdminAuth = (function() {
       // Clean local session even if network drops
     }
     clearSession();
-    const isPages = window.location.pathname.includes('/pages/');
-    window.location.href = isPages ? 'login.html' : 'pages/login.html';
+    window.location.href = '/admin/pages/login.html';
   }
 
   function renderSidebar(activeMenu = 'dashboard') {

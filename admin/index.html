@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard — PrintX Multi-Shop</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="/admin/css/admin.css">
 </head>
 <body>
 
@@ -13,7 +13,7 @@
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar">
       <div class="sidebar-header">
-        <a href="index.html" class="sidebar-brand">
+        <a href="/admin/index.html" class="sidebar-brand">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
             <path d="M6 14h12v8H6z"/>
@@ -24,25 +24,25 @@
 
       <ul class="sidebar-menu">
         <li>
-          <a href="index.html" class="sidebar-link active">
+          <a href="/admin/index.html" class="sidebar-link active">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Dashboard
           </a>
         </li>
         <li>
-          <a href="pages/orders.html" class="sidebar-link">
+          <a href="/admin/pages/orders.html" class="sidebar-link">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             All Order Prints
           </a>
         </li>
         <li>
-          <a href="pages/qr-code.html" class="sidebar-link">
+          <a href="/admin/pages/qr-code.html" class="sidebar-link">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Create Your QR Code
           </a>
         </li>
         <li>
-          <a href="pages/profile.html" class="sidebar-link">
+          <a href="/admin/pages/profile.html" class="sidebar-link">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             Shop Profile
           </a>
@@ -82,7 +82,7 @@
             <p class="page-subtitle">Real-time order queue metrics & isolated shop performance.</p>
           </div>
 
-          <a href="pages/qr-code.html" class="btn btn-primary" style="height: 44px; padding: 0 20px; font-weight: 600;">
+          <a href="/admin/pages/qr-code.html" class="btn btn-primary" style="height: 44px; padding: 0 20px; font-weight: 600;">
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Create Your QR Code
           </a>
@@ -123,7 +123,7 @@
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">Recent Shop Orders</h3>
-            <a href="pages/orders.html" class="btn btn-secondary btn-sm">View All Orders ➔</a>
+            <a href="/admin/pages/orders.html" class="btn btn-secondary btn-sm">View All Orders ➔</a>
           </div>
 
           <div class="table-responsive">
@@ -156,9 +156,9 @@
 
   </div>
 
-  <script src="js/config.js"></script>
-  <script src="js/api.js"></script>
-  <script src="js/auth.js"></script>
+  <script src="/admin/js/config.js"></script>
+  <script src="/admin/js/api.js"></script>
+  <script src="/admin/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', async () => {
       if (!AdminAuth.requireAdminAuth()) return;

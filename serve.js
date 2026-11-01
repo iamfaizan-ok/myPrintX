@@ -19,6 +19,36 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+function serveFile(res, filePath) {
+  fs.stat(filePath, (err, stats) => {
+    if (err) {
+      res.writeHead(404, { 'Content-Type': 'text/plain; charset=UTF-8' });
+      res.end('404 Not Found');
+      return;
+    }
+
+    if (stats.isDirectory()) {
+      const indexCandidate = path.join(filePath, 'index.html');
+      if (fs.existsSync(indexCandidate)) {
+        return serveFile(res, indexCandidate);
+      }
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=UTF-8' });
+      res.end('403 Forbidden: Directory Listing Not Allowed');
+      return;
+    }
+
+    const ext = path.extname(filePath).toLowerCase();
+    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+
+    res.writeHead(200, {
+      'Content-Type': contentType,
+      'Content-Length': stats.size,
+      'Cache-Control': 'no-cache'
+    });
+    fs.createReadStream(filePath).pipe(res);
+  });
+}
+
 const server = http.createServer((req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -32,52 +62,64 @@ const server = http.createServer((req, res) => {
 
   let reqPath = decodeURI(req.url.split('?')[0]);
 
-  let rootDir = USER_FRONTEND_DIR;
-  let relativePath = reqPath;
-
-  if (reqPath.startsWith('/admin')) {
-    rootDir = ADMIN_DIR;
-    relativePath = reqPath.slice('/admin'.length);
-    if (relativePath === '' || relativePath === '/') {
-      relativePath = '/index.html';
-    }
-  } else {
-    if (relativePath === '' || relativePath === '/') {
-      relativePath = '/index.html';
-    }
+  // Normalize /admin trailing slash to preserve relative link resolution
+  if (reqPath === '/admin') {
+    res.writeHead(302, { Location: '/admin/' });
+    res.end();
+    return;
   }
 
-  const filePath = path.join(rootDir, relativePath);
+  // Handle /admin/pages shortcut
+  if (reqPath === '/admin/pages' || reqPath === '/admin/pages/') {
+    res.writeHead(302, { Location: '/admin/pages/orders.html' });
+    res.end();
+    return;
+  }
 
-  if (!filePath.startsWith(rootDir)) {
-    res.writeHead(403, { 'Content-Type': 'text/plain' });
+  // Admin routing
+  if (reqPath.startsWith('/admin/')) {
+    let subPath = reqPath.slice('/admin'.length);
+    if (subPath === '' || subPath === '/') {
+      subPath = '/index.html';
+    }
+    const adminFilePath = path.join(ADMIN_DIR, subPath);
+
+    if (!adminFilePath.startsWith(ADMIN_DIR)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=UTF-8' });
+      res.end('403 Forbidden');
+      return;
+    }
+
+    return serveFile(res, adminFilePath);
+  }
+
+  // User Frontend routing with automatic Admin asset fallback
+  let userRelative = reqPath;
+  if (userRelative === '' || userRelative === '/') {
+    userRelative = '/index.html';
+  }
+  const userFilePath = path.join(USER_FRONTEND_DIR, userRelative);
+
+  if (!userFilePath.startsWith(USER_FRONTEND_DIR)) {
+    res.writeHead(403, { 'Content-Type': 'text/plain; charset=UTF-8' });
     res.end('403 Forbidden');
     return;
   }
 
-  fs.stat(filePath, (err, stats) => {
-    if (err) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' });
-      res.end(`404 Not Found: ${reqPath}`);
-      return;
+  // Check if file exists in user_frontend
+  fs.stat(userFilePath, (err, stats) => {
+    if (!err && (stats.isFile() || stats.isDirectory())) {
+      return serveFile(res, userFilePath);
     }
 
-    if (stats.isDirectory()) {
-      const target = reqPath.endsWith('/') ? reqPath + 'index.html' : reqPath + '/index.html';
-      res.writeHead(302, { Location: target });
-      res.end();
-      return;
+    // Fallback: Check if file exists in admin/ (e.g., /css/admin.css or /js/auth.js requested from root)
+    const adminFallbackPath = path.join(ADMIN_DIR, reqPath);
+    if (adminFallbackPath.startsWith(ADMIN_DIR) && fs.existsSync(adminFallbackPath) && fs.statSync(adminFallbackPath).isFile()) {
+      return serveFile(res, adminFallbackPath);
     }
 
-    const ext = path.extname(filePath).toLowerCase();
-    const contentType = MIME_TYPES[ext] || 'application/octet-stream';
-
-    res.writeHead(200, {
-      'Content-Type': contentType,
-      'Content-Length': stats.size,
-      'Cache-Control': 'no-cache'
-    });
-    fs.createReadStream(filePath).pipe(res);
+    res.writeHead(404, { 'Content-Type': 'text/plain; charset=UTF-8' });
+    res.end(`404 Not Found: ${reqPath}`);
   });
 });
 

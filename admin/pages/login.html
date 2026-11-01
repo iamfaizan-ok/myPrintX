@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Sign In — PrintX</title>
-  <link rel="stylesheet" href="../css/admin.css">
+  <link rel="stylesheet" href="/admin/css/admin.css">
 </head>
 <body style="background-color: var(--bg-subtle); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px 16px;">
 
@@ -53,13 +53,13 @@
 
   </div>
 
-  <script src="../js/config.js"></script>
-  <script src="../js/api.js"></script>
-  <script src="../js/auth.js"></script>
+  <script src="/admin/js/config.js"></script>
+  <script src="/admin/js/api.js"></script>
+  <script src="/admin/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       if (AdminAuth.isAuthenticated()) {
-        window.location.href = '../index.html';
+        window.location.href = '/admin/index.html';
         return;
       }
 
@@ -100,7 +100,7 @@
           const res = await AdminApi.auth.login({ email, password });
           if (res && res.success && res.data) {
             AdminAuth.setSession(res.data.token, res.data.user, res.data.shop);
-            window.location.href = '../index.html';
+            window.location.href = '/admin/index.html';
           } else {
             throw new Error((res && res.message) || 'Invalid login response.');
           }
