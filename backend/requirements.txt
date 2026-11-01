@@ -10,3 +10,4 @@ qrcode==8.2
 sqlparse==0.6.0
 asgiref==3.13.0
 tzdata==2026.6
+gunicorn==22.0.0
