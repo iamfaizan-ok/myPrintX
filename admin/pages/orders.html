@@ -86,15 +86,23 @@
         <!-- Alert Container -->
         <div id="orders-alert-container"></div>
 
-        <!-- Filter Buttons -->
-        <div class="d-flex gap-2 mb-4" style="flex-wrap: wrap;">
-          <button type="button" class="btn btn-secondary btn-sm filter-btn active" data-filter="">All Orders</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="pending">Pending</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="payment_pending">Payment Pending</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="printing">Printing</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="ready_for_pickup">Ready for Pickup</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="completed">Completed</button>
-          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="blocked">Blocked</button>
+        <!-- Filter and Search Controls -->
+        <div class="d-flex justify-between items-center mb-4" style="flex-wrap: wrap; gap: 12px;">
+          <!-- Filter Buttons -->
+          <div class="d-flex gap-2" style="flex-wrap: wrap;">
+            <button type="button" class="btn btn-secondary btn-sm filter-btn active" data-filter="">All Orders</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="pending">Pending</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="payment_pending">Payment Pending</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="printing">Printing</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="ready_for_pickup">Ready for Pickup</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="completed">Completed</button>
+            <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="blocked">Blocked</button>
+          </div>
+
+          <!-- Live Search Bar -->
+          <div style="min-width: 260px; max-width: 340px; width: 100%;">
+            <input type="text" id="order-search-input" class="form-control" placeholder="Search Order #, customer, document..." style="height: 36px; font-size: 0.8125rem;">
+          </div>
         </div>
 
         <!-- Orders Table Card -->
@@ -122,6 +130,29 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination Bar -->
+          <div id="pagination-bar" class="d-flex justify-between items-center" style="padding: 12px 20px; border-top: 1px solid var(--border-subtle); background-color: var(--bg-subtle); font-size: 0.8125rem;">
+            <span id="pagination-info" style="color: var(--text-muted);">Showing 0 orders</span>
+            <div class="d-flex gap-2 items-center">
+              <button type="button" id="prev-page-btn" class="btn btn-secondary btn-sm" disabled>Previous</button>
+              <span id="page-indicator" style="font-weight: 600; padding: 0 8px;">Page 1</span>
+              <button type="button" id="next-page-btn" class="btn btn-secondary btn-sm" disabled>Next</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Detail Modal -->
+        <div id="order-detail-modal" class="d-none" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+          <div class="card" style="max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto;">
+            <div class="card-header">
+              <h3 class="card-title" id="modal-order-number">Order Details</h3>
+              <button type="button" id="modal-close-btn" class="btn btn-secondary btn-sm">✕ Close</button>
+            </div>
+            <div id="modal-content" style="padding: 16px 0;">
+              Loading details...
+            </div>
+          </div>
         </div>
 
       </div>
@@ -142,23 +173,74 @@
       const alertContainer = document.getElementById('orders-alert-container');
       const refreshBtn = document.getElementById('refresh-btn');
       const filterBtns = document.querySelectorAll('.filter-btn');
+      const searchInput = document.getElementById('order-search-input');
+      const prevPageBtn = document.getElementById('prev-page-btn');
+      const nextPageBtn = document.getElementById('next-page-btn');
+      const pageIndicator = document.getElementById('page-indicator');
+      const paginationInfo = document.getElementById('pagination-info');
+
+      // Modal elements
+      const detailModal = document.getElementById('order-detail-modal');
+      const modalCloseBtn = document.getElementById('modal-close-btn');
+      const modalOrderNum = document.getElementById('modal-order-number');
+      const modalContent = document.getElementById('modal-content');
 
       let currentFilter = '';
+      let currentSearch = '';
+      let currentPage = 1;
+      let totalPages = 1;
+      let searchTimeout = null;
+
+      if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => {
+          detailModal.classList.add('d-none');
+        });
+      }
 
       filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
           filterBtns.forEach(b => b.classList.remove('active', 'btn-primary'));
           btn.classList.add('active');
           currentFilter = btn.dataset.filter;
-          loadOrders(currentFilter);
+          currentPage = 1;
+          loadOrders();
         });
       });
 
-      if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => loadOrders(currentFilter));
+      if (searchInput) {
+        searchInput.addEventListener('input', () => {
+          clearTimeout(searchTimeout);
+          searchTimeout = setTimeout(() => {
+            currentSearch = searchInput.value.trim();
+            currentPage = 1;
+            loadOrders();
+          }, 350);
+        });
       }
 
-      async function loadOrders(filter = '') {
+      if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => {
+          if (currentPage > 1) {
+            currentPage--;
+            loadOrders();
+          }
+        });
+      }
+
+      if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => {
+          if (currentPage < totalPages) {
+            currentPage++;
+            loadOrders();
+          }
+        });
+      }
+
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => loadOrders());
+      }
+
+      async function loadOrders() {
         alertContainer.innerHTML = '';
         tbody.innerHTML = `
           <tr>
@@ -169,15 +251,27 @@
         `;
 
         try {
-          const res = await AdminApi.orders.list(filter);
-          if (res && res.success && Array.isArray(res.data)) {
-            const orders = res.data;
+          const res = await AdminApi.orders.list(currentFilter, currentSearch, currentPage, 10);
+          if (res && res.success) {
+            let orders = [];
+            let totalCount = 0;
+
+            if (Array.isArray(res.data)) {
+              orders = res.data;
+              totalCount = res.total_count !== undefined ? res.total_count : orders.length;
+              totalPages = res.total_pages || Math.max(1, Math.ceil(totalCount / 10));
+            }
+
+            paginationInfo.textContent = `Showing ${orders.length} of ${totalCount} order(s)`;
+            pageIndicator.textContent = `Page ${currentPage} of ${totalPages}`;
+            prevPageBtn.disabled = (currentPage <= 1);
+            nextPageBtn.disabled = (currentPage >= totalPages);
 
             if (orders.length === 0) {
               tbody.innerHTML = `
                 <tr>
                   <td colspan="8" class="text-center" style="padding: 40px; color: var(--text-muted);">
-                    No orders found in this filter for your shop.
+                    No orders found matching the selected filter or search term.
                   </td>
                 </tr>
               `;
@@ -192,7 +286,11 @@
               const isBlocked = order.is_blocked;
 
               tr.innerHTML = `
-                <td style="font-weight: 700;">${order.order_number}</td>
+                <td style="font-weight: 700;">
+                  <a href="#" class="btn-inspect-order" data-id="${order.id}" style="color: var(--primary); text-decoration: underline;" title="View Details & Audit Trail">
+                    ${order.order_number}
+                  </a>
+                </td>
                 <td>
                   <div style="font-weight: 600;">${order.document_name}</div>
                   ${order.document_download_url ? `<a href="${CONFIG.API_BASE_URL}${order.document_download_url}?token=${AdminAuth.getToken()}" target="_blank" style="font-size: 0.75rem; color: var(--primary);">Download / View File</a>` : ''}
@@ -243,6 +341,46 @@
       }
 
       function attachActionHandlers() {
+        // Inspect Order Modal
+        document.querySelectorAll('.btn-inspect-order').forEach(link => {
+          link.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const id = link.dataset.id;
+            detailModal.classList.remove('d-none');
+            modalContent.innerHTML = '<p class="text-center text-muted">Loading complete audit trail and print jobs...</p>';
+            try {
+              const res = await AdminApi.orders.getById(id);
+              if (res && res.success && res.data) {
+                const o = res.data;
+                modalOrderNum.textContent = `Order ${o.order_number}`;
+                const jobsHtml = (res.print_jobs && res.print_jobs.length > 0)
+                  ? res.print_jobs.map(j => `<li>Job #${j.id} - Status: <strong>${j.status.toUpperCase()}</strong> ${j.error_message ? `(Error: ${j.error_message})` : ''}</li>`).join('')
+                  : '<li>No print jobs created yet.</li>';
+                const logsHtml = (res.audit_logs && res.audit_logs.length > 0)
+                  ? res.audit_logs.map(l => `<li style="font-size: 11px; margin-bottom: 4px;"><strong>${l.action}</strong> by ${l.user} [${new Date(l.timestamp).toLocaleTimeString()}]: ${l.notes || ''}</li>`).join('')
+                  : '<li>No audit logs recorded.</li>';
+
+                modalContent.innerHTML = `
+                  <div style="font-size: 0.875rem;">
+                    <p><strong>Customer:</strong> ${o.customer_name} (${o.customer_phone || 'Walk-in'})</p>
+                    <p><strong>Document:</strong> ${o.document_name}</p>
+                    <p><strong>Print Specs:</strong> ${o.copies} copies, ${o.color_mode.toUpperCase()}, ${o.paper_size}, ${o.binding}</p>
+                    <p><strong>Total:</strong> Rs. ${o.total_price} | <strong>Payment:</strong> ${o.payment_method} (${o.payment_status.toUpperCase()})</p>
+                    <p><strong>Special Instructions:</strong> ${o.special_instructions || 'None'}</p>
+                    <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-subtle);">
+                    <h4 style="font-size: 0.875rem; margin-bottom: 6px;">Print Jobs:</h4>
+                    <ul style="padding-left: 20px; font-size: 0.8125rem;">${jobsHtml}</ul>
+                    <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-subtle);">
+                    <h4 style="font-size: 0.875rem; margin-bottom: 6px;">Security Audit Trail:</h4>
+                    <ul style="padding-left: 20px;">${logsHtml}</ul>
+                  </div>
+                `;
+              }
+            } catch(err) {
+              modalContent.innerHTML = `<div class="alert alert-error">${err.message || 'Failed to load order details.'}</div>`;
+            }
+          });
+        });
         // 1. Pay OK Action
         document.querySelectorAll('.btn-pay-ok').forEach(btn => {
           btn.addEventListener('click', async () => {

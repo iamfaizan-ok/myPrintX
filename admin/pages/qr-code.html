@@ -168,6 +168,27 @@
       const generateBtn = document.getElementById('generate-qr-btn');
       const printStandBtn = document.getElementById('print-stand-btn');
 
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', async (e) => {
+          if (!qrImage.src) return;
+          e.preventDefault();
+          try {
+            const resp = await fetch(qrImage.src);
+            const blob = await resp.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PrintX_QR_${shopIdEl.textContent || 'counter'}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+          } catch(err) {
+            window.open(qrImage.src, '_blank');
+          }
+        });
+      }
+
       if (printStandBtn) {
         printStandBtn.addEventListener('click', () => {
           window.print();

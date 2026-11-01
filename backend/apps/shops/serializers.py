@@ -21,4 +21,4 @@ class ShopSerializer(serializers.ModelSerializer):
 class PublicShopSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shop
-        fields = ['public_id', 'name', 'contact_phone', 'address', 'is_active', 'opening_hours']
+        fields = ['id', 'public_id', 'name', 'contact_phone', 'address', 'is_active', 'opening_hours']

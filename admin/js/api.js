@@ -83,6 +83,7 @@ const AdminApi = (function() {
       signup: (data) => AdminApi.post('/admin/auth/signup/', data),
       login: (credentials) => AdminApi.post('/admin/auth/login/', credentials),
       getProfile: () => AdminApi.get('/admin/auth/me/'),
+      updateProfile: (data) => AdminApi.patch('/admin/auth/me/', data),
       logout: () => AdminApi.post('/admin/auth/logout/', {})
     },
 
@@ -91,8 +92,15 @@ const AdminApi = (function() {
     },
 
     orders: {
-      list: (status = '') => {
-        const query = status ? `?status=${encodeURIComponent(status)}` : '';
+      list: (status = '', search = '', page = null, pageSize = 10) => {
+        const params = new URLSearchParams();
+        if (status) params.append('status', status);
+        if (search) params.append('search', search);
+        if (page) {
+          params.append('page', page);
+          params.append('page_size', pageSize);
+        }
+        const query = params.toString() ? `?${params.toString()}` : '';
         return AdminApi.get(`/admin/orders/${query}`);
       },
       getById: (id) => AdminApi.get(`/admin/orders/${encodeURIComponent(id)}/`),

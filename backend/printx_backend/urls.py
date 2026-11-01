@@ -9,7 +9,7 @@ from apps.shops.views import PublicShopDetailView, PublicShopListView, AdminShop
 from apps.documents.views import DocumentUploadView, DocumentDetailView, DocumentDownloadView
 
 from apps.orders.views import (
-    AdminDashboardStatsView, AdminOrderListView, AdminOrderPayOKView, 
+    AdminDashboardStatsView, AdminOrderListView, AdminOrderDetailView, AdminOrderPayOKView, 
     AdminOrderAuthorizePrintView, AdminOrderBlockView,
     CustomerOrderCreateView, CustomerOrderTrackView, CustomerPricingCalculateView,
     AdminAgentTokenView, AgentPollJobsView, AgentUpdateJobStatusView,
@@ -28,6 +28,7 @@ urlpatterns = [
     # 2. Admin Dashboard & Order Management (Shop-Isolated)
     path('api/v1/admin/dashboard/stats/', AdminDashboardStatsView.as_view(), name='admin_dashboard_stats'),
     path('api/v1/admin/orders/', AdminOrderListView.as_view(), name='admin_orders_list'),
+    path('api/v1/admin/orders/<int:pk>/', AdminOrderDetailView.as_view(), name='admin_order_detail'),
     path('api/v1/admin/orders/<int:pk>/pay-ok/', AdminOrderPayOKView.as_view(), name='admin_order_pay_ok'),
     path('api/v1/admin/orders/<int:pk>/authorize-print/', AdminOrderAuthorizePrintView.as_view(), name='admin_order_authorize_print'),
     path('api/v1/admin/orders/<int:pk>/block/', AdminOrderBlockView.as_view(), name='admin_order_block'),

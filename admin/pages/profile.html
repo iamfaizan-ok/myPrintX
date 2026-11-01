@@ -116,6 +116,47 @@
           </form>
         </div>
 
+        <!-- Admin Account Settings Card -->
+        <div class="card" style="margin-top: 24px;">
+          <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+            Admin Account & Credentials
+          </h2>
+          <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 20px;">
+            Update your personal administrator identity and sign-in credentials.
+          </p>
+
+          <form id="account-form">
+            <div class="form-group">
+              <label class="form-label" for="acc-admin-name">Administrator Name *</label>
+              <input type="text" id="acc-admin-name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="acc-admin-phone">Personal Phone</label>
+              <input type="tel" id="acc-admin-phone" class="form-control" placeholder="+92-300-1234567">
+            </div>
+
+            <div style="border-top: 1px solid var(--border-subtle); margin: 20px 0 16px 0; padding-top: 16px;">
+              <span style="font-size: 0.875rem; font-weight: 600; color: var(--text-main);">Change Password (Optional)</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div class="form-group">
+                <label class="form-label" for="acc-current-pw">Current Password</label>
+                <input type="password" id="acc-current-pw" class="form-control" placeholder="••••••••">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="acc-new-pw">New Password (Min 6 chars)</label>
+                <input type="password" id="acc-new-pw" class="form-control" placeholder="••••••••" minlength="6">
+              </div>
+            </div>
+
+            <button type="submit" id="save-account-btn" class="btn btn-primary" style="margin-top: 12px;">
+              Update Account Settings
+            </button>
+          </form>
+        </div>
+
         <!-- PC Print Agent Hardware Pairing Card -->
         <div class="card" style="margin-top: 24px;">
           <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
@@ -229,6 +270,56 @@
         }
       });
 
+
+      // Load Admin Account details
+      const adminData = AdminAuth.getAdmin();
+      const adminNameInput = document.getElementById('acc-admin-name');
+      const adminPhoneInput = document.getElementById('acc-admin-phone');
+      const currentPwInput = document.getElementById('acc-current-pw');
+      const newPwInput = document.getElementById('acc-new-pw');
+      const accountForm = document.getElementById('account-form');
+      const saveAccountBtn = document.getElementById('save-account-btn');
+
+      if (adminData) {
+        if (adminNameInput) adminNameInput.value = adminData.name || '';
+        if (adminPhoneInput) adminPhoneInput.value = adminData.phone || '';
+      }
+
+      if (accountForm) {
+        accountForm.addEventListener('submit', async (e) => {
+          e.preventDefault();
+          alertContainer.innerHTML = '';
+          saveAccountBtn.disabled = true;
+          saveAccountBtn.textContent = 'Updating Account...';
+
+          const payload = {
+            name: adminNameInput.value.trim(),
+            phone: adminPhoneInput.value.trim()
+          };
+          if (newPwInput.value) {
+            payload.new_password = newPwInput.value;
+            payload.current_password = currentPwInput.value;
+          }
+
+          try {
+            const res = await AdminApi.auth.updateProfile(payload);
+            if (res && res.success) {
+              alertContainer.innerHTML = '<div class="alert alert-success">Admin account settings updated successfully.</div>';
+              if (res.data && res.data.user) {
+                localStorage.setItem(CONFIG.STORAGE_KEYS.ADMIN_USER, JSON.stringify(res.data.user));
+                document.getElementById('topbar-admin-name').textContent = res.data.user.name;
+              }
+              currentPwInput.value = '';
+              newPwInput.value = '';
+            }
+          } catch(err) {
+            alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Failed to update account settings.'}</div>`;
+          } finally {
+            saveAccountBtn.disabled = false;
+            saveAccountBtn.textContent = 'Update Account Settings';
+          }
+        });
+      }
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();

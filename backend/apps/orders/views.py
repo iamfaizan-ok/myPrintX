@@ -47,9 +47,13 @@ class AdminDashboardStatsView(APIView):
             }
         })
 
+from django.db.models import Q
+from django.core.paginator import Paginator
+
 class AdminOrderListView(APIView):
     """
     List orders belonging strictly to the currently authenticated admin's shop.
+    Supports filtering by status, search by query, and pagination.
     """
     permission_classes = [IsAuthenticated]
 
@@ -69,9 +73,70 @@ class AdminOrderListView(APIView):
             else:
                 orders_qs = orders_qs.filter(status=status_filter)
 
+        search_query = request.query_params.get('search', '').strip()
+        if search_query:
+            orders_qs = orders_qs.filter(
+                Q(order_number__icontains=search_query) |
+                Q(customer_name__icontains=search_query) |
+                Q(customer_phone__icontains=search_query) |
+                Q(document__original_name__icontains=search_query)
+            )
+
+        page = request.query_params.get('page')
+        if page:
+            page_size = int(request.query_params.get('page_size', 10))
+            paginator = Paginator(orders_qs, page_size)
+            try:
+                page_obj = paginator.get_page(int(page))
+            except Exception:
+                page_obj = paginator.get_page(1)
+
+            return Response({
+                'success': True,
+                'data': OrderSerializer(page_obj.object_list, many=True).data,
+                'total_count': paginator.count,
+                'total_pages': paginator.num_pages,
+                'current_page': page_obj.number,
+                'has_next': page_obj.has_next(),
+                'has_previous': page_obj.has_previous()
+            })
+
         return Response({
             'success': True,
-            'data': OrderSerializer(orders_qs, many=True).data
+            'data': OrderSerializer(orders_qs, many=True).data,
+            'total_count': orders_qs.count()
+        })
+
+
+class AdminOrderDetailView(APIView):
+    """
+    Detailed inspection of a specific order belonging to the admin's shop.
+    Returns order specifications, linked payment, print jobs, and audit logs.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'Admin shop not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        order = get_object_or_404(Order, pk=pk, shop=shop)
+        
+        jobs = PrintJob.objects.filter(order=order)
+        logs = AuditLog.objects.filter(order=order).order_by('-timestamp')
+        
+        return Response({
+            'success': True,
+            'data': OrderSerializer(order).data,
+            'print_jobs': PrintJobSerializer(jobs, many=True).data,
+            'audit_logs': [
+                {
+                    'action': l.action,
+                    'user': l.user.email if l.user else 'System',
+                    'notes': l.notes,
+                    'timestamp': l.timestamp.isoformat()
+                } for l in logs
+            ]
         })
 
 class AdminOrderPayOKView(APIView):
@@ -254,10 +319,14 @@ class CustomerOrderTrackView(APIView):
         if provided_token and provided_token == order.access_token:
             is_authorized = True
 
+        # When searched by exact unique order number from counter slip
+        if order.order_number.lower() == order_identifier.lower():
+            is_authorized = True
+
         if not is_authorized:
             return Response({
                 'success': False,
-                'message': 'Security Protection: Order tracking requires a valid secret access token.'
+                'message': 'Security Protection: Order tracking requires a valid Order Number or access token.'
             }, status=status.HTTP_403_FORBIDDEN)
 
         return Response({

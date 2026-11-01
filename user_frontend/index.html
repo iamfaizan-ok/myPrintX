@@ -176,17 +176,21 @@
           res.data.forEach(shop => {
             const card = document.createElement('div');
             card.className = 'card';
+            const isOpen = shop.is_active !== undefined ? shop.is_active : true;
+            const shopId = shop.public_id || shop.id;
+            const hours = shop.opening_hours || shop.openingHours || '08:00 - 20:00';
+
             card.innerHTML = `
               <div class="d-flex items-center justify-between mb-2">
                 <h4 class="card-title">${App.escapeHTML(shop.name)}</h4>
-                <span class="badge ${shop.isOpen ? 'badge-completed' : 'badge-cancelled'}">
-                  ${shop.isOpen ? 'Counter Open' : 'Closed'}
+                <span class="badge ${isOpen ? 'badge-completed' : 'badge-cancelled'}">
+                  ${isOpen ? 'Counter Open' : 'Closed'}
                 </span>
               </div>
               <p class="text-muted">${App.escapeHTML(shop.address)}</p>
               <div class="d-flex items-center justify-between mt-4">
-                <span class="text-muted font-medium" style="font-size: var(--font-size-xs);">Hours: ${App.escapeHTML(shop.openingHours || 'All Day')}</span>
-                <a href="pages/upload.html?shop=${encodeURIComponent(shop.id)}" class="btn btn-primary btn-sm">Print Here</a>
+                <span class="text-muted font-medium" style="font-size: var(--font-size-xs);">Hours: ${App.escapeHTML(hours)}</span>
+                <a href="pages/upload.html?shop=${encodeURIComponent(shopId)}" class="btn btn-primary btn-sm">Print Here</a>
               </div>
             `;
             container.appendChild(card);

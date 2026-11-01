@@ -101,6 +101,12 @@
           </div>
         </div>
 
+        <!-- Action Buttons -->
+        <a id="receipt-track-btn" href="order-tracking.html" class="btn btn-secondary btn-lg btn-full mb-3" style="height: 48px; font-size: var(--font-size-base); display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          Track This Order
+        </a>
+
         <!-- OK Button -->
         <button type="button" id="receipt-ok-btn" class="btn btn-primary btn-lg btn-full" style="height: 48px; font-size: var(--font-size-base);">
           OK (Print Another Document)
@@ -212,6 +218,12 @@
       statusEl.className = `badge ${statusClass}`;
 
       document.getElementById('receipt-total').textContent = App.formatCurrency(order.total_price, order.currency || 'PKR');
+
+      const trackBtn = document.getElementById('receipt-track-btn');
+      if (trackBtn) {
+        const tokenQuery = order.access_token ? `&token=${encodeURIComponent(order.access_token)}` : '';
+        trackBtn.href = `order-tracking.html?orderId=${encodeURIComponent(orderNumber)}${tokenQuery}`;
+      }
 
       // "OK" Button Handler -> Clears active upload session and returns directly to upload.html
       const okBtn = document.getElementById('receipt-ok-btn');

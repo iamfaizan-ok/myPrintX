@@ -65,21 +65,20 @@ document.addEventListener('DOMContentLoaded', () => {
     App.clearAlert(alertContainerId);
     if (searchBtn) App.setButtonLoading(searchBtn, true, 'Searching...');
 
-    // If token wasn't in URL query, check if cached receipt matches this order
-    if (!tokenParam) {
-      const cached = localStorage.getItem('printx_last_receipt');
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (parsed.order_number === orderIdentifier || parsed.id == orderIdentifier) {
-            tokenParam = parsed.access_token || '';
-          }
-        } catch(e) {}
-      }
+    // Check if matching access token is cached locally
+    let searchToken = tokenParam;
+    const cached = localStorage.getItem('printx_last_receipt');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (parsed.order_number === orderIdentifier || parsed.id == orderIdentifier) {
+          searchToken = parsed.access_token || searchToken;
+        }
+      } catch(e) {}
     }
 
     try {
-      const res = await Api.orders.track(orderIdentifier, tokenParam);
+      const res = await Api.orders.track(orderIdentifier, searchToken);
       if (res && res.success && res.data) {
         renderOrder(res.data);
       } else {

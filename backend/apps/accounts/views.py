@@ -62,6 +62,42 @@ class AdminMeView(APIView):
             }
         })
 
+    def patch(self, request):
+        user = request.user
+        name = request.data.get('name')
+        phone = request.data.get('phone')
+        new_password = request.data.get('new_password')
+        current_password = request.data.get('current_password')
+
+        if name:
+            user.name = name.strip()
+        if phone is not None:
+            user.phone = phone.strip()
+
+        if new_password:
+            if not current_password or not user.check_password(current_password):
+                return Response({
+                    'success': False,
+                    'message': 'Current password is required and must be correct to set a new password.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            if len(new_password) < 6:
+                return Response({
+                    'success': False,
+                    'message': 'New password must be at least 6 characters.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(new_password)
+
+        user.save()
+        shop = getattr(user, 'owned_shop', None)
+        return Response({
+            'success': True,
+            'message': 'Account settings updated successfully.',
+            'data': {
+                'user': UserSerializer(user).data,
+                'shop': ShopSerializer(shop).data if shop else None
+            }
+        })
+
 class AdminLogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
