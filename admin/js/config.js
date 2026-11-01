@@ -1,11 +1,14 @@
 /**
  * PrintX Admin Configuration
- * Centralized settings and backend endpoint URLs.
+ * Centralized settings and backend endpoint URLs (auto-detects Localhost vs Production).
  */
+const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+
 const CONFIG = {
   APP_NAME: 'PrintX Admin Hub',
-  // Django REST API Base URL
-  API_BASE_URL: 'http://localhost:8000/api/v1',
+  API_BASE_URL: isLocal 
+    ? 'http://localhost:8000/api/v1' 
+    : (localStorage.getItem('printx_api_url') || 'https://printx-backend.onrender.com/api/v1'),
   STORAGE_KEYS: {
     ADMIN_TOKEN: 'printx_admin_token',
     ADMIN_USER: 'printx_admin_user',

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "routes": [
+    {
+      "src": "^/admin/?$",
+      "dest": "/admin/index.html"
+    },
+    {
+      "src": "^/admin/(.*)",
+      "dest": "/admin/$1"
+    },
+    {
+      "src": "^/$",
+      "dest": "/user_frontend/index.html"
+    },
+    {
+      "src": "^/pages/(.*)",
+      "dest": "/user_frontend/pages/$1"
+    },
+    {
+      "src": "^/css/(.*)",
+      "dest": "/user_frontend/css/$1"
+    },
+    {
+      "src": "^/js/(.*)",
+      "dest": "/user_frontend/js/$1"
+    },
+    {
+      "src": "^/assets/(.*)",
+      "dest": "/user_frontend/assets/$1"
+    },
+    {
+      "src": "^/(.*)",
+      "dest": "/user_frontend/$1"
+    }
+  ]
+}
