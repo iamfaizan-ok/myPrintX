@@ -33,10 +33,13 @@ const App = (function() {
   }
 
   /**
-   * Format monetary amount
+   * Format monetary amount in PKR (Rs.)
    */
-  function formatCurrency(amount, currency = 'USD') {
+  function formatCurrency(amount, currency = 'PKR') {
     const num = Number(amount) || 0;
+    if (currency === 'PKR' || !currency) {
+      return `Rs. ${num.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: currency

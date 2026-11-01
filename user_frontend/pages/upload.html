@@ -67,8 +67,8 @@
         </div>
 
         <div class="section-header" style="margin-bottom: var(--space-6);">
-          <h2>Upload Your PDF Document</h2>
-          <p>Supported format: Genuine PDF documents (.pdf, maximum 50 MB).</p>
+          <h2>Upload Your Document</h2>
+          <p>Supported formats: PDF, Word (DOCX/DOC), Images (PNG, JPG, WEBP), Text (maximum 50 MB).</p>
         </div>
 
         <!-- Alert Container -->
@@ -81,11 +81,11 @@
               <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
             </svg>
           </div>
-          <div class="dropzone-title">Click to browse or drop your PDF document here</div>
+          <div class="dropzone-title">Click to browse or drop your document here</div>
           <div class="dropzone-desc mt-1">Automatic verification & instantaneous page detection.</div>
         </div>
 
-        <input type="file" id="file-input" class="d-none" accept=".pdf,application/pdf">
+        <input type="file" id="file-input" class="d-none" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg,.webp,.txt,image/*,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
 
         <!-- Selected File Preview Card -->
         <div id="file-details-card" class="card d-none mt-4" style="background-color: var(--bg-subtle);">

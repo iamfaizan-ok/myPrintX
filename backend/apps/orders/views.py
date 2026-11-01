@@ -289,17 +289,17 @@ class CustomerPricingCalculateView(APIView):
             except Exception:
                 selected_pages = total_doc_pages
 
-        base_rate = 0.50 if color_mode == 'color' else 0.10
-        paper_mult = 1.8 if paper_size == 'A3' else 1.0
+        # PKR live pricing: 1 B&W copy = Rs. 10, 1 Color copy = Rs. 20
+        base_rate = 20.0 if color_mode == 'color' else 10.0
+        paper_mult = 1.5 if paper_size == 'A3' else 1.0
         pages_subtotal = (base_rate * paper_mult) * selected_pages * copies
         if duplex and selected_pages > 1:
             pages_subtotal *= 0.90
 
-        binding_rates = {'none': 0.0, 'staple': 0.50, 'spiral': 3.00, 'hardcover': 8.00}
+        binding_rates = {'none': 0.0, 'staple': 10.0, 'spiral': 50.0, 'hardcover': 150.0}
         binding_fee = binding_rates.get(binding, 0.0) * copies
         subtotal = pages_subtotal + binding_fee
-        tax = subtotal * 0.08
-        total_price = round(subtotal + tax, 2)
+        total_price = round(subtotal, 2)
 
         return Response({
             'success': True,
@@ -311,9 +311,9 @@ class CustomerPricingCalculateView(APIView):
                 'pagesSubtotal': round(pages_subtotal, 2),
                 'bindingFee': round(binding_fee, 2),
                 'subtotal': round(subtotal, 2),
-                'tax': round(tax, 2),
+                'tax': 0.0,
                 'totalPrice': total_price,
-                'currency': 'USD'
+                'currency': 'PKR'
             }
         })
 

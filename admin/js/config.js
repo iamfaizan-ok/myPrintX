@@ -14,7 +14,7 @@ const CONFIG = {
     ADMIN_USER: 'printx_admin_user',
     ADMIN_SHOP: 'printx_admin_shop'
   },
-  DEFAULT_CURRENCY: 'USD'
+  DEFAULT_CURRENCY: 'PKR'
 };
 
 Object.freeze(CONFIG);

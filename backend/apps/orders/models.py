@@ -45,7 +45,7 @@ class Order(models.Model):
     
     # Financials
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    currency = models.CharField(max_length=10, default='USD')
+    currency = models.CharField(max_length=10, default='PKR')
     payment_method = models.CharField(max_length=30, default='cash_on_pickup')
     payment_status = models.CharField(max_length=30, choices=PAYMENT_STATUS_CHOICES, default='unpaid')
     
@@ -86,7 +86,7 @@ class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment_record')
     shop = models.ForeignKey('shops.Shop', on_delete=models.CASCADE, related_name='payments')
     amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=10, default='USD')
+    currency = models.CharField(max_length=10, default='PKR')
     method = models.CharField(max_length=50, default='cash_on_pickup')
     status = models.CharField(max_length=30, choices=STATUS_CHOICES, default='pending')
     reference_id = models.CharField(max_length=100, blank=True, null=True)

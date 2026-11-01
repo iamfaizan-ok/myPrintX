@@ -86,7 +86,7 @@
             </div>
             <div class="d-flex justify-between items-center mt-3 pt-3" style="font-size: var(--font-size-sm); border-top: 1px dashed var(--border-subtle);">
               <span class="text-muted font-medium">Total Payment Due:</span>
-              <span id="receipt-total" class="font-bold text-main" style="font-size: var(--font-size-xl); color: var(--success);">$0.00</span>
+              <span id="receipt-total" class="font-bold text-main" style="font-size: var(--font-size-xl); color: var(--success);">Rs. 0.00</span>
             </div>
           </div>
         </div>
@@ -211,7 +211,7 @@
       statusEl.textContent = statusLabel;
       statusEl.className = `badge ${statusClass}`;
 
-      document.getElementById('receipt-total').textContent = App.formatCurrency(order.total_price, order.currency || 'USD');
+      document.getElementById('receipt-total').textContent = App.formatCurrency(order.total_price, order.currency || 'PKR');
 
       // "OK" Button Handler -> Clears active upload session and returns directly to upload.html
       const okBtn = document.getElementById('receipt-ok-btn');

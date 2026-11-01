@@ -201,7 +201,7 @@
                 <td style="font-size: 0.75rem; color: var(--text-secondary);">
                   ${order.copies}x, ${order.color_mode === 'color' ? 'Color' : 'B&W'}, ${order.paper_size}${order.duplex ? ', Duplex' : ''}
                 </td>
-                <td style="font-weight: 700;">$${order.total_price}</td>
+                <td style="font-weight: 700;">Rs. ${order.total_price}</td>
                 <td><span class="badge ${paymentBadge}">${order.payment_status.toUpperCase()}</span></td>
                 <td>
                   <span class="badge ${statusBadge}">${order.status.replace(/_/g, ' ').toUpperCase()}</span>

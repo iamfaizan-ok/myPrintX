@@ -118,12 +118,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       return;
     }
 
-    // Strict PDF validation check
-    const isPdfExt = file.name && file.name.toLowerCase().endsWith('.pdf');
-    const isPdfMime = file.type === 'application/pdf';
+    // Multi-format support: PDF, Word docs, Images, Text
+    const allowedExtensions = ['.pdf', '.doc', '.docx', '.png', '.jpg', '.jpeg', '.webp', '.bmp', '.tiff', '.txt', '.rtf'];
+    const ext = file.name && file.name.includes('.') ? file.name.substring(file.name.lastIndexOf('.')).toLowerCase() : '';
+    const isImage = file.type && file.type.startsWith('image/');
+    const isAllowedExt = allowedExtensions.includes(ext);
 
-    if (!isPdfExt && !isPdfMime) {
-      App.showAlert(alertContainerId, 'Invalid file format. Please select a genuine PDF document (.pdf).');
+    if (!isImage && !isAllowedExt) {
+      App.showAlert(alertContainerId, 'Unsupported file format. Please select a PDF, Word document (DOC/DOCX), Image (PNG/JPG/WEBP), or Text file.');
       return;
     }
 
@@ -139,7 +141,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (uploadBtn) {
     uploadBtn.addEventListener('click', async () => {
       if (!selectedFile) {
-        App.showAlert(alertContainerId, 'Please select a PDF document first.');
+        App.showAlert(alertContainerId, 'Please select a document or image first.');
         return;
       }
 

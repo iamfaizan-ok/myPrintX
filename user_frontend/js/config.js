@@ -15,7 +15,7 @@ const CONFIG = {
     CURRENT_SHOP: 'printx_current_shop'
   },
   DEFAULT_SHOP_NAME: 'PrintX Counter',
-  DEFAULT_CURRENCY: 'USD'
+  DEFAULT_CURRENCY: 'PKR'
 };
 
 Object.freeze(CONFIG);

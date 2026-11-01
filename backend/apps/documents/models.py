@@ -1,3 +1,4 @@
+import os
 import uuid
 import hashlib
 from django.db import models
@@ -11,7 +12,10 @@ def generate_storage_key():
 def document_upload_path(instance, filename):
     if not getattr(instance, 'storage_key', None):
         instance.storage_key = f"doc_{uuid.uuid4().hex}"
-    return f"{instance.storage_key}.pdf"
+    ext = os.path.splitext(filename)[1].lower() if filename else ''
+    if not ext:
+        ext = '.bin'
+    return f"{instance.storage_key}{ext}"
 
 
 class Document(models.Model):
