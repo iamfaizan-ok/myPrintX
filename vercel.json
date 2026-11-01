@@ -1,38 +1,46 @@
 {
   "version": 2,
   "cleanUrls": true,
-  "routes": [
+  "rewrites": [
     {
-      "src": "^/admin/?$",
-      "dest": "/admin/index.html"
+      "source": "/",
+      "destination": "/user_frontend/index.html"
     },
     {
-      "src": "^/admin/(.*)",
-      "dest": "/admin/$1"
+      "source": "/admin",
+      "destination": "/admin/index.html"
     },
     {
-      "src": "^/$",
-      "dest": "/user_frontend/index.html"
+      "source": "/admin/",
+      "destination": "/admin/index.html"
     },
     {
-      "src": "^/pages/(.*)",
-      "dest": "/user_frontend/pages/$1"
+      "source": "/admin/pages/:path*",
+      "destination": "/admin/pages/:path*"
     },
     {
-      "src": "^/css/(.*)",
-      "dest": "/user_frontend/css/$1"
+      "source": "/admin/css/:path*",
+      "destination": "/admin/css/:path*"
     },
     {
-      "src": "^/js/(.*)",
-      "dest": "/user_frontend/js/$1"
+      "source": "/admin/js/:path*",
+      "destination": "/admin/js/:path*"
     },
     {
-      "src": "^/assets/(.*)",
-      "dest": "/user_frontend/assets/$1"
+      "source": "/pages/:path*",
+      "destination": "/user_frontend/pages/:path*"
     },
     {
-      "src": "^/(.*)",
-      "dest": "/user_frontend/$1"
+      "source": "/css/:path*",
+      "destination": "/user_frontend/css/:path*"
+    },
+    {
+      "source": "/js/:path*",
+      "destination": "/user_frontend/js/:path*"
+    },
+    {
+      "source": "/assets/:path*",
+      "destination": "/user_frontend/assets/:path*"
     }
   ]
 }

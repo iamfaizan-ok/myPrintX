@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrintX — Online Printing Platform</title>
+  <script>
+    // Seamless redirect preserving all query parameters (e.g. ?shop=...)
+    const currentSearch = window.location.search;
+    window.location.replace('/user_frontend/index.html' + currentSearch);
+  </script>
+  <meta http-equiv="refresh" content="0; url=/user_frontend/index.html">
+</head>
+<body style="font-family: sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; background-color: #f8fafc;">
+  <div style="text-align: center;">
+    <h2 style="color: #1e293b;">Loading PrintX...</h2>
+    <p style="color: #64748b;">If you are not redirected automatically, <a href="/user_frontend/index.html" style="color: #2563eb;">click here</a>.</p>
+  </div>
+</body>
+</html>
