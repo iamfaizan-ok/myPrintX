@@ -288,22 +288,22 @@
               tr.innerHTML = `
                 <td style="font-weight: 700;">
                   <a href="#" class="btn-inspect-order" data-id="${order.id}" style="color: var(--primary); text-decoration: underline;" title="View Details & Audit Trail">
-                    ${order.order_number}
+                    ${escapeHTML(order.order_number)}
                   </a>
                 </td>
                 <td>
-                  <div style="font-weight: 600;">${order.document_name}</div>
+                  <div style="font-weight: 600;">${escapeHTML(order.document_name)}</div>
                   ${order.document_download_url ? `<a href="${CONFIG.API_BASE_URL}${order.document_download_url}?token=${AdminAuth.getToken()}" target="_blank" style="font-size: 0.75rem; color: var(--primary);">Download / View File</a>` : ''}
                 </td>
 
                 <td style="font-size: 0.75rem; color: var(--text-secondary);">
-                  ${order.copies}x, ${order.color_mode === 'color' ? 'Color' : 'B&W'}, ${order.paper_size}${order.duplex ? ', Duplex' : ''}
+                  ${order.copies}x, ${order.color_mode === 'color' ? 'Color' : 'B&W'}, ${escapeHTML(order.paper_size)}${order.duplex ? ', Duplex' : ''}
                 </td>
-                <td style="font-weight: 700;">Rs. ${order.total_price}</td>
-                <td><span class="badge ${paymentBadge}">${order.payment_status.toUpperCase()}</span></td>
+                <td style="font-weight: 700;">Rs. ${escapeHTML(order.total_price)}</td>
+                <td><span class="badge ${paymentBadge}">${escapeHTML(order.payment_status).toUpperCase()}</span></td>
                 <td>
-                  <span class="badge ${statusBadge}">${order.status.replace(/_/g, ' ').toUpperCase()}</span>
-                  ${isBlocked && order.blocked_reason ? `<div style="font-size: 10px; color: var(--error); margin-top: 2px;">${order.blocked_reason}</div>` : ''}
+                  <span class="badge ${statusBadge}">${escapeHTML(order.status).replace(/_/g, ' ').toUpperCase()}</span>
+                  ${isBlocked && order.blocked_reason ? `<div style="font-size: 10px; color: var(--error); margin-top: 2px;">${escapeHTML(order.blocked_reason)}</div>` : ''}
                 </td>
                 <td style="color: var(--text-muted); font-size: 0.75rem;">${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
                 <td style="text-align: right;">
@@ -336,7 +336,7 @@
             attachActionHandlers();
           }
         } catch (err) {
-          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Error loading orders.'}</div>`;
+          alertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(err.message || 'Error loading orders.')}</div>`;
         }
       }
 
@@ -354,19 +354,19 @@
                 const o = res.data;
                 modalOrderNum.textContent = `Order ${o.order_number}`;
                 const jobsHtml = (res.print_jobs && res.print_jobs.length > 0)
-                  ? res.print_jobs.map(j => `<li>Job #${j.id} - Status: <strong>${j.status.toUpperCase()}</strong> ${j.error_message ? `(Error: ${j.error_message})` : ''}</li>`).join('')
+                  ? res.print_jobs.map(j => `<li>Job #${j.id} - Status: <strong>${escapeHTML(j.status).toUpperCase()}</strong> ${j.error_message ? `(Error: ${escapeHTML(j.error_message)})` : ''}</li>`).join('')
                   : '<li>No print jobs created yet.</li>';
                 const logsHtml = (res.audit_logs && res.audit_logs.length > 0)
-                  ? res.audit_logs.map(l => `<li style="font-size: 11px; margin-bottom: 4px;"><strong>${l.action}</strong> by ${l.user} [${new Date(l.timestamp).toLocaleTimeString()}]: ${l.notes || ''}</li>`).join('')
+                  ? res.audit_logs.map(l => `<li style="font-size: 11px; margin-bottom: 4px;"><strong>${escapeHTML(l.action)}</strong> by ${escapeHTML(l.user)} [${new Date(l.timestamp).toLocaleTimeString()}]: ${escapeHTML(l.notes || '')}</li>`).join('')
                   : '<li>No audit logs recorded.</li>';
 
                 modalContent.innerHTML = `
                   <div style="font-size: 0.875rem;">
-                    <p><strong>Customer:</strong> ${o.customer_name} (${o.customer_phone || 'Walk-in'})</p>
-                    <p><strong>Document:</strong> ${o.document_name}</p>
-                    <p><strong>Print Specs:</strong> ${o.copies} copies, ${o.color_mode.toUpperCase()}, ${o.paper_size}, ${o.binding}</p>
-                    <p><strong>Total:</strong> Rs. ${o.total_price} | <strong>Payment:</strong> ${o.payment_method} (${o.payment_status.toUpperCase()})</p>
-                    <p><strong>Special Instructions:</strong> ${o.special_instructions || 'None'}</p>
+                    <p><strong>Customer:</strong> ${escapeHTML(o.customer_name)} (${escapeHTML(o.customer_phone || 'Walk-in')})</p>
+                    <p><strong>Document:</strong> ${escapeHTML(o.document_name)}</p>
+                    <p><strong>Print Specs:</strong> ${o.copies} copies, ${escapeHTML(o.color_mode).toUpperCase()}, ${escapeHTML(o.paper_size)}, ${escapeHTML(o.binding)}</p>
+                    <p><strong>Total:</strong> Rs. ${escapeHTML(o.total_price)} | <strong>Payment:</strong> ${escapeHTML(o.payment_method)} (${escapeHTML(o.payment_status).toUpperCase()})</p>
+                    <p><strong>Special Instructions:</strong> ${escapeHTML(o.special_instructions || 'None')}</p>
                     <hr style="margin: 12px 0; border: none; border-top: 1px solid var(--border-subtle);">
                     <h4 style="font-size: 0.875rem; margin-bottom: 6px;">Print Jobs:</h4>
                     <ul style="padding-left: 20px; font-size: 0.8125rem;">${jobsHtml}</ul>

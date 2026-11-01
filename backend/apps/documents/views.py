@@ -1,3 +1,4 @@
+import re
 from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
@@ -5,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.throttling import ScopedRateThrottle
 
 from .models import Document
 from .serializers import DocumentSerializer, DocumentUploadSerializer
@@ -16,6 +18,8 @@ class DocumentUploadView(APIView):
     Validates genuine PDF content and saves strictly in private file storage.
     """
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'order_create'
     parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request):
@@ -95,15 +99,15 @@ class DocumentDownloadView(APIView):
         if not is_authorized and agent_token:
             agent = PrintAgent.objects.filter(agent_token=agent_token, shop=doc.shop).first()
             if agent:
-                # Also verify the document is associated with an active/authorized order
-                if Order.objects.filter(document=doc, shop=doc.shop, status__in=['confirmed', 'printing', 'ready_for_pickup', 'completed']).exists():
+                # Also verify the document is associated with an active/authorized non-blocked order
+                if Order.objects.filter(document=doc, shop=doc.shop, is_blocked=False, status__in=['confirmed', 'printing', 'ready_for_pickup', 'completed']).exists():
                     is_authorized = True
                     actor = f"agent:{agent.agent_name}"
 
         # 3. Guest tracking token check
         tracking_token = request.query_params.get('tracking_token')
         if not is_authorized and tracking_token:
-            if Order.objects.filter(document=doc, access_token=tracking_token).exists():
+            if Order.objects.filter(document=doc, access_token=tracking_token, is_blocked=False).exists():
                 is_authorized = True
                 actor = "customer_guest"
 
@@ -116,8 +120,8 @@ class DocumentDownloadView(APIView):
         if not doc.file or not doc.file.storage.exists(doc.file.name):
             raise Http404("Document file not found on private storage volume.")
 
-        # Stream file safely with Content-Disposition
-        safe_filename = doc.original_name.replace('"', '')
+        # Stream file safely with sanitized Content-Disposition header preventing HTTP splitting
+        safe_filename = re.sub(r'[\r\n"\'\\/]', '', doc.original_name or 'document.pdf')
         response = FileResponse(
             doc.file.open('rb'),
             content_type=doc.mime_type or 'application/pdf'

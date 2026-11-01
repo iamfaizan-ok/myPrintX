@@ -2,12 +2,15 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.authtoken.models import Token
 from .serializers import AdminSignupSerializer, AdminLoginSerializer, UserSerializer
 from apps.shops.serializers import ShopSerializer
 
 class AdminSignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(self, request):
         serializer = AdminSignupSerializer(data=request.data)
@@ -29,6 +32,8 @@ class AdminSignupView(APIView):
 
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
 
     def post(self, request):
         serializer = AdminLoginSerializer(data=request.data)

@@ -14,8 +14,19 @@ const CONFIG = {
     ADMIN_USER: 'printx_admin_user',
     ADMIN_SHOP: 'printx_admin_shop'
   },
-  DEFAULT_CURRENCY: 'PKR'
+  DEFAULT_CURRENCY: 'PKR',
+  escapeHTML: function(str) {
+    if (str === null || str === undefined) return '';
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
 };
+
+const escapeHTML = CONFIG.escapeHTML;
 
 Object.freeze(CONFIG);
 Object.freeze(CONFIG.STORAGE_KEYS);

@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.throttling import ScopedRateThrottle
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import Order, AuditLog, Payment, PrintAgent, PrintJob
@@ -278,6 +279,8 @@ class CustomerOrderCreateView(APIView):
     Customer places a print order for a specific shop (via QR scan)
     """
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'order_create'
 
     def post(self, request):
         serializer = OrderCreateSerializer(data=request.data)
@@ -407,6 +410,8 @@ class OnlinePaymentInitiateView(APIView):
     Never simulates successful payments without real gateway.
     """
     permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'order_create'
 
     def post(self, request):
         order_number = request.data.get('order_number')
