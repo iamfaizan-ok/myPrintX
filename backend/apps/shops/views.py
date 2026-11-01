@@ -1,0 +1,104 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from django.shortcuts import get_object_or_404
+from .models import Shop
+from .serializers import ShopSerializer, PublicShopSerializer
+
+class PublicShopDetailView(APIView):
+    """
+    Public endpoint: Customer scans QR code -> frontend queries shop by public_id
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request, public_id):
+        shop = get_object_or_404(Shop, public_id=public_id, is_active=True)
+        return Response({
+            'success': True,
+            'data': PublicShopSerializer(shop).data
+        })
+
+class PublicShopListView(APIView):
+    """
+    Lists active shops for customer discovery fallback
+    """
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        shops = Shop.objects.filter(is_active=True)
+        return Response({
+            'success': True,
+            'data': PublicShopSerializer(shops, many=True).data
+        })
+
+class AdminShopProfileView(APIView):
+    """
+    Shop admin views and updates their own shop details
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'No shop associated with this admin.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'success': True, 'data': ShopSerializer(shop).data})
+
+    def patch(self, request):
+        shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'No shop associated with this admin.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        serializer = ShopSerializer(shop, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'success': True, 'message': 'Shop profile updated.', 'data': serializer.data})
+        return Response({'success': False, 'errors': serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+class AdminQRGenerateView(APIView):
+    """
+    Generates or retrieves unique shop QR code for currently authenticated shop
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'No shop associated with this admin.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Generate QR code
+        qr_url = shop.generate_qr_code()
+        target_customer_url = f"http://localhost:3000/pages/upload.html?shop={shop.public_id}"
+
+        return Response({
+            'success': True,
+            'message': 'Shop QR Code generated successfully.',
+            'data': {
+                'public_id': shop.public_id,
+                'shop_name': shop.name,
+                'qr_code_url': qr_url,
+                'scan_target_url': target_customer_url
+            }
+        })
+
+class AdminQRDetailsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'No shop found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if not shop.qr_code_image:
+            shop.generate_qr_code()
+
+        target_customer_url = f"http://localhost:3000/pages/upload.html?shop={shop.public_id}"
+        return Response({
+            'success': True,
+            'data': {
+                'public_id': shop.public_id,
+                'shop_name': shop.name,
+                'qr_code_url': shop.qr_code_image.url if shop.qr_code_image else None,
+                'scan_target_url': target_customer_url
+            }
+        })

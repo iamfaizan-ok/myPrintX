@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Profile — PrintX Admin Hub</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          PrintX Admin
+        </a>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li>
+          <a href="../index.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            All Order Prints
+          </a>
+        </li>
+        <li>
+          <a href="qr-code.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Create Your QR Code
+          </a>
+        </li>
+        <li>
+          <a href="profile.html" class="sidebar-link active">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Shop Profile
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link action-logout" style="color: #EF4444;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+      
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="topbar-shop-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="topbar-shop-name">My Print Shop</span>
+        </div>
+
+        <div class="topbar-admin-info">
+          <span id="topbar-admin-name" style="font-size: 0.875rem; font-weight: 600; color: var(--text-main);">Shop Admin</span>
+          <button type="button" class="btn btn-secondary btn-sm action-logout">Logout</button>
+        </div>
+      </header>
+
+      <div class="admin-content" style="max-width: 800px;">
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">Shop Profile & Settings</h1>
+            <p class="page-subtitle">Update your business information displayed to customers when scanning your counter QR code.</p>
+          </div>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="profile-alert-container"></div>
+
+        <div class="card">
+          <form id="profile-form">
+            <div class="form-group">
+              <label class="form-label">Shop Public ID</label>
+              <input type="text" id="prof-public-id" class="form-control" disabled style="background-color: var(--bg-subtle);">
+              <span style="font-size: 0.75rem; color: var(--text-muted);">Unique identifier encoded in your counter QR code.</span>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prof-shop-name">Shop Name *</label>
+              <input type="text" id="prof-shop-name" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prof-shop-phone">Contact Phone *</label>
+              <input type="tel" id="prof-shop-phone" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prof-shop-address">Physical Counter Address *</label>
+              <textarea id="prof-shop-address" class="form-control" style="height: 70px;" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="prof-opening-hours">Opening Hours *</label>
+              <input type="text" id="prof-opening-hours" class="form-control" placeholder="08:00 - 20:00" required>
+            </div>
+
+            <button type="submit" id="save-profile-btn" class="btn btn-primary" style="margin-top: 12px;">
+              Save Profile Changes
+            </button>
+          </form>
+        </div>
+
+        <!-- PC Print Agent Hardware Pairing Card -->
+        <div class="card" style="margin-top: 24px;">
+          <h2 style="font-size: 1.125rem; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">
+            PC Print Agent Pairing
+          </h2>
+          <p style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 20px;">
+            The PrintX Agent runs on your shop's counter PC and spools authorized print jobs directly to your local printer.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">Shop Agent Pairing Token</label>
+            <div class="d-flex gap-2">
+              <input type="text" id="agent-token-input" class="form-control" readonly style="font-family: monospace; background-color: var(--bg-subtle);">
+              <button type="button" id="copy-token-btn" class="btn btn-secondary" style="white-space: nowrap;">Copy Token</button>
+              <button type="button" id="regen-token-btn" class="btn btn-secondary" style="white-space: nowrap;">Regenerate</button>
+            </div>
+            <span style="font-size: 0.75rem; color: var(--text-muted); display: block; margin-top: 4px;">
+              Keep this token confidential. It grants local hardware access exclusively for your shop's jobs.
+            </span>
+          </div>
+
+          <div style="background-color: var(--bg-subtle); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 16px;">
+            <div style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 8px;">
+              How to start your PC Print Agent:
+            </div>
+            <code id="agent-cli-command" style="font-size: 0.8125rem; color: var(--text-main); word-break: break-all; display: block;">
+              python print_agent.py --token <span id="cli-token-placeholder">YOUR_TOKEN</span>
+            </code>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!AdminAuth.requireAdminAuth()) return;
+      AdminAuth.renderSidebar('profile');
+
+      const alertContainer = document.getElementById('profile-alert-container');
+      const form = document.getElementById('profile-form');
+      const submitBtn = document.getElementById('save-profile-btn');
+
+      const publicIdInput = document.getElementById('prof-public-id');
+      const nameInput = document.getElementById('prof-shop-name');
+      const phoneInput = document.getElementById('prof-shop-phone');
+      const addressInput = document.getElementById('prof-shop-address');
+      const hoursInput = document.getElementById('prof-opening-hours');
+
+      const tokenInput = document.getElementById('agent-token-input');
+      const copyTokenBtn = document.getElementById('copy-token-btn');
+      const regenTokenBtn = document.getElementById('regen-token-btn');
+      const cliPlaceholder = document.getElementById('cli-token-placeholder');
+
+      // Load Profile
+      try {
+        const res = await AdminApi.shop.getProfile();
+        if (res && res.success && res.data) {
+          const s = res.data;
+          publicIdInput.value = s.public_id;
+          nameInput.value = s.name;
+          phoneInput.value = s.contact_phone;
+          addressInput.value = s.address;
+          hoursInput.value = s.opening_hours;
+        }
+      } catch (err) {
+        alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Error loading profile.'}</div>`;
+      }
+
+      // Load Agent Token
+      async function loadAgentToken() {
+        try {
+          const res = await AdminApi.agent.getToken();
+          if (res && res.success && res.data) {
+            const token = res.data.agent_token;
+            tokenInput.value = token;
+            cliPlaceholder.textContent = token;
+          }
+        } catch (err) {
+          console.error('Agent token fetch error:', err);
+        }
+      }
+      loadAgentToken();
+
+      copyTokenBtn.addEventListener('click', () => {
+        if (tokenInput.value) {
+          navigator.clipboard.writeText(tokenInput.value);
+          copyTokenBtn.textContent = 'Copied!';
+          setTimeout(() => { copyTokenBtn.textContent = 'Copy Token'; }, 2000);
+        }
+      });
+
+      regenTokenBtn.addEventListener('click', async () => {
+        const confirmed = window.confirm('Regenerate agent token? The current PC Print Agent process will be disconnected until updated with the new token.');
+        if (!confirmed) return;
+        try {
+          const res = await AdminApi.agent.regenerateToken();
+          if (res && res.success && res.data) {
+            tokenInput.value = res.data.agent_token;
+            cliPlaceholder.textContent = res.data.agent_token;
+            alertContainer.innerHTML = '<div class="alert alert-success">Agent token regenerated successfully.</div>';
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Failed to regenerate token.'}</div>`;
+        }
+      });
+
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertContainer.innerHTML = '';
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Saving...';
+
+        try {
+          const res = await AdminApi.shop.updateProfile({
+            name: nameInput.value.trim(),
+            contact_phone: phoneInput.value.trim(),
+            address: addressInput.value.trim(),
+            opening_hours: hoursInput.value.trim()
+          });
+
+          if (res && res.success) {
+            alertContainer.innerHTML = '<div class="alert alert-success">Shop profile updated successfully.</div>';
+            document.getElementById('topbar-shop-name').textContent = nameInput.value.trim();
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Failed to update profile.'}</div>`;
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Save Profile Changes';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Track Your Order — PrintX</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <svg class="navbar-brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        PrintX
+      </a>
+
+      <nav>
+        <ul class="navbar-menu">
+          <li><a href="../index.html" class="navbar-link">Home</a></li>
+          <li><a href="upload.html" class="navbar-link">Upload Document</a></li>
+          <li><a href="order-tracking.html" class="navbar-link active">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div id="navbar-auth-slot" class="navbar-actions"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-medium">
+
+      <div class="section-header">
+        <h2>Order Status & Tracking</h2>
+        <p>Monitor your print job in real time from queue placement to counter pickup.</p>
+      </div>
+
+      <!-- Alert Container -->
+      <div id="tracking-alert-container"></div>
+
+      <!-- Search Card -->
+      <div class="card mb-6">
+        <div class="d-flex gap-3">
+          <input type="text" id="tracking-search-input" class="form-control" placeholder="Enter Order ID (e.g. ord_88194) or Order Number">
+          <button type="button" id="tracking-search-btn" class="btn btn-primary" style="flex-shrink: 0; min-width: 120px;">
+            Track Order
+          </button>
+        </div>
+      </div>
+
+      <!-- Tracking Result Card (hidden until loaded) -->
+      <div id="tracking-result-card" class="card d-none">
+        
+        <div class="card-header">
+          <div>
+            <div class="text-muted" style="font-size: var(--font-size-xs);">ORDER IDENTIFIER</div>
+            <h3 id="track-order-number" class="mt-1">-</h3>
+          </div>
+          <div class="d-flex items-center gap-3">
+            <span id="track-status-badge" class="badge badge-pending">PENDING</span>
+            <button type="button" id="refresh-order-btn" class="btn btn-secondary btn-sm" title="Refresh Status">
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        <!-- Cancelled Warning (if applicable) -->
+        <div id="cancelled-banner" class="alert alert-error d-none mb-6">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>
+          </svg>
+          <div><strong>Order Cancelled:</strong> This print order has been revoked and is no longer being processed.</div>
+        </div>
+
+        <!-- 5-Step Progress Tracker -->
+        <div class="workflow-steps mt-6 mb-8">
+          <div class="workflow-connector"></div>
+          
+          <div id="step-1" class="workflow-step active">
+            <div class="workflow-step-circle">1</div>
+            <div class="workflow-step-title">Order Placed</div>
+          </div>
+
+          <div id="step-2" class="workflow-step">
+            <div class="workflow-step-circle">2</div>
+            <div class="workflow-step-title">Confirmed</div>
+          </div>
+
+          <div id="step-3" class="workflow-step">
+            <div class="workflow-step-circle">3</div>
+            <div class="workflow-step-title">Printing</div>
+          </div>
+
+          <div id="step-4" class="workflow-step">
+            <div class="workflow-step-circle">4</div>
+            <div class="workflow-step-title">Ready for Pickup</div>
+          </div>
+
+          <div id="step-5" class="workflow-step">
+            <div class="workflow-step-circle">5</div>
+            <div class="workflow-step-title">Completed</div>
+          </div>
+        </div>
+
+        <!-- Order Information Table -->
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td style="width: 30%; font-weight: var(--font-weight-medium); color: var(--text-secondary);">Document:</td>
+                <td id="track-doc-name" class="font-semibold">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Print Hub:</td>
+                <td id="track-shop-name">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Print Specifications:</td>
+                <td id="track-copies">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Payment:</td>
+                <td id="track-payment-status">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Total Price:</td>
+                <td id="track-total" class="font-bold text-primary">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Placed At:</td>
+                <td id="track-date" class="text-muted">-</td>
+              </tr>
+              <tr>
+                <td style="font-weight: var(--font-weight-medium); color: var(--text-secondary);">Special Instructions:</td>
+                <td id="track-instructions" class="text-muted">-</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-between items-center mt-6" style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-4);">
+          <a href="upload.html" class="btn btn-primary btn-sm">
+            Upload Another Document
+          </a>
+          <button type="button" id="cancel-order-btn" class="btn btn-danger btn-sm d-none">
+            Cancel Order
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border-top: none;">
+      <span>&copy; 2026 PrintX Inc. All rights reserved.</span>
+      <span>Live Order Telemetry Engine</span>
+    </div>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/tracking.js"></script>
+
+</body>
+</html>

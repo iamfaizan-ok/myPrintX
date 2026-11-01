@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Sign In — PrintX</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body style="background-color: var(--bg-subtle); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 20px 16px;">
+
+  <div class="card" style="max-width: 440px; width: 100%; margin: 0 auto; box-shadow: var(--shadow-md);">
+    
+    <div class="text-center mb-4">
+      <div class="sidebar-brand justify-center" style="color: var(--primary); font-size: 1.5rem; justify-content: center;">
+        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        PrintX Multi-Shop
+      </div>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">Shop Admin Sign In</h2>
+      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">
+        Access your print order queue, shop analytics, and QR code manager.
+      </p>
+    </div>
+
+    <!-- Alert Container -->
+    <div id="login-alert-container"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="email">Admin Email Address</label>
+        <input type="email" id="email" class="form-control" placeholder="admin@printshop.com" required autocomplete="email">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div style="position: relative;">
+          <input type="password" id="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+          <button type="button" id="toggle-pw" style="position: absolute; right: 10px; top: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.75rem;">Show</button>
+        </div>
+      </div>
+
+      <button type="submit" id="submit-login-btn" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 0.95rem; margin-top: 12px;">
+        Sign In to Shop Dashboard
+      </button>
+    </form>
+
+    <div class="text-center mt-4" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+      <span style="font-size: 0.875rem; color: var(--text-secondary);">New shop owner?</span>
+      <a href="signup.html" style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin-left: 6px;">Register Shop & Account</a>
+    </div>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (AdminAuth.isAuthenticated()) {
+        window.location.href = '../index.html';
+        return;
+      }
+
+      const form = document.getElementById('login-form');
+      const submitBtn = document.getElementById('submit-login-btn');
+      const alertContainer = document.getElementById('login-alert-container');
+      const togglePw = document.getElementById('toggle-pw');
+      const pwInput = document.getElementById('password');
+
+      if (togglePw && pwInput) {
+        togglePw.addEventListener('click', () => {
+          if (pwInput.type === 'password') {
+            pwInput.type = 'text';
+            togglePw.textContent = 'Hide';
+          } else {
+            pwInput.type = 'password';
+            togglePw.textContent = 'Show';
+          }
+        });
+      }
+
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        alertContainer.innerHTML = '';
+
+        const email = document.getElementById('email').value.trim();
+        const password = document.getElementById('password').value;
+
+        if (!email || !password) {
+          alertContainer.innerHTML = '<div class="alert alert-error">Please enter both email and password.</div>';
+          return;
+        }
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Authenticating...';
+
+        try {
+          const res = await AdminApi.auth.login({ email, password });
+          if (res && res.success && res.data) {
+            AdminAuth.setSession(res.data.token, res.data.user, res.data.shop);
+            window.location.href = '../index.html';
+          } else {
+            throw new Error((res && res.message) || 'Invalid login response.');
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Incorrect email or password.'}</div>`;
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Sign In to Shop Dashboard';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

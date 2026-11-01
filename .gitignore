@@ -1,0 +1,30 @@
+# Environment variables and secrets
+.env
+*.env
+*.env.local
+.env.*
+!.env.example
+
+# Private Customer Document Storage
+private_printx_storage/
+/private_printx_storage/
+
+# Python / Django
+__pycache__/
+*.py[cod]
+*$py.class
+*.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+.venv/
+env/
+venv/
+
+# Node / Frontend
+node_modules/
+.npm/
+
+# Logs & temp
+*.log
+.codeatlas/

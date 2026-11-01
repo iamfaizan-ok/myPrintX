@@ -1,0 +1,100 @@
+/* ==========================================================================
+   PrintX Responsive - responsive.css
+   Clean Media Queries for Mobile (<640px), Tablet (641px - 1024px), Desktop
+   ========================================================================== */
+
+/* Tablet & Mobile (<= 1024px) */
+@media (max-width: 1024px) {
+  .grid-sidebar {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .grid-3 {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-6);
+  }
+}
+
+/* Mobile Devices (<= 768px) */
+@media (max-width: 768px) {
+  .navbar-inner {
+    height: 56px;
+  }
+
+  .navbar-menu {
+    gap: var(--space-3);
+  }
+
+  .navbar-link span {
+    display: none;
+  }
+
+  .grid-2,
+  .grid-3,
+  .grid-4 {
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+
+  .section-header h1,
+  .section-header h2 {
+    font-size: var(--font-size-xl);
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .workflow-step-title {
+    font-size: 10px;
+  }
+
+  .workflow-connector {
+    left: 5%;
+    right: 5%;
+  }
+
+  .footer-inner {
+    grid-template-columns: 1fr;
+  }
+
+  .footer-bottom {
+    flex-direction: column;
+    gap: var(--space-3);
+    text-align: center;
+  }
+
+  .options-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .card {
+    padding: var(--space-4);
+  }
+
+  .dropzone {
+    padding: var(--space-6) var(--space-3);
+  }
+}
+
+/* Small Mobile (<= 480px) */
+@media (max-width: 480px) {
+  .options-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .navbar-actions {
+    gap: var(--space-2);
+  }
+}

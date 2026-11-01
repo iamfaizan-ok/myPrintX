@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Order Prints — PrintX Admin Hub</title>
+  <link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          PrintX Admin
+        </a>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li>
+          <a href="../index.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" class="sidebar-link active">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            All Order Prints
+          </a>
+        </li>
+        <li>
+          <a href="qr-code.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Create Your QR Code
+          </a>
+        </li>
+        <li>
+          <a href="profile.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Shop Profile
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link action-logout" style="color: #EF4444;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+      
+      <!-- Topbar -->
+      <header class="admin-topbar">
+        <div class="topbar-shop-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="topbar-shop-name">My Print Shop</span>
+        </div>
+
+        <div class="topbar-admin-info">
+          <span id="topbar-admin-name" style="font-size: 0.875rem; font-weight: 600; color: var(--text-main);">Shop Admin</span>
+          <button type="button" class="btn btn-secondary btn-sm action-logout">Logout</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <div class="page-header">
+          <div>
+            <h1 class="page-title">All Order Prints</h1>
+            <p class="page-subtitle">Shop-isolated queue. Verify cash payments and trigger authorized physical prints.</p>
+          </div>
+          <button type="button" id="refresh-btn" class="btn btn-secondary btn-sm">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Refresh Queue
+          </button>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="orders-alert-container"></div>
+
+        <!-- Filter Buttons -->
+        <div class="d-flex gap-2 mb-4" style="flex-wrap: wrap;">
+          <button type="button" class="btn btn-secondary btn-sm filter-btn active" data-filter="">All Orders</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="pending">Pending</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="payment_pending">Payment Pending</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="printing">Printing</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="ready_for_pickup">Ready for Pickup</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="completed">Completed</button>
+          <button type="button" class="btn btn-secondary btn-sm filter-btn" data-filter="blocked">Blocked</button>
+        </div>
+
+        <!-- Orders Table Card -->
+        <div class="card" style="padding: 0; overflow: hidden;">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Order ID</th>
+                  <th>Document Name</th>
+                  <th>Specs</th>
+                  <th>Total Due</th>
+                  <th>Payment Status</th>
+                  <th>Print Status</th>
+                  <th>Date</th>
+                  <th style="text-align: right; min-width: 220px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="orders-tbody">
+                <tr>
+                  <td colspan="8" class="text-center" style="padding: 32px; color: var(--text-muted);">
+                    Loading shop orders...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!AdminAuth.requireAdminAuth()) return;
+      AdminAuth.renderSidebar('orders');
+
+      const tbody = document.getElementById('orders-tbody');
+      const alertContainer = document.getElementById('orders-alert-container');
+      const refreshBtn = document.getElementById('refresh-btn');
+      const filterBtns = document.querySelectorAll('.filter-btn');
+
+      let currentFilter = '';
+
+      filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach(b => b.classList.remove('active', 'btn-primary'));
+          btn.classList.add('active');
+          currentFilter = btn.dataset.filter;
+          loadOrders(currentFilter);
+        });
+      });
+
+      if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => loadOrders(currentFilter));
+      }
+
+      async function loadOrders(filter = '') {
+        alertContainer.innerHTML = '';
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="text-center" style="padding: 32px; color: var(--text-muted);">
+              Loading shop orders from backend...
+            </td>
+          </tr>
+        `;
+
+        try {
+          const res = await AdminApi.orders.list(filter);
+          if (res && res.success && Array.isArray(res.data)) {
+            const orders = res.data;
+
+            if (orders.length === 0) {
+              tbody.innerHTML = `
+                <tr>
+                  <td colspan="8" class="text-center" style="padding: 40px; color: var(--text-muted);">
+                    No orders found in this filter for your shop.
+                  </td>
+                </tr>
+              `;
+              return;
+            }
+
+            tbody.innerHTML = '';
+            orders.forEach(order => {
+              const tr = document.createElement('tr');
+              const paymentBadge = order.payment_status === 'paid' ? 'badge-paid' : 'badge-unpaid';
+              const statusBadge = `badge-${order.status}`;
+              const isBlocked = order.is_blocked;
+
+              tr.innerHTML = `
+                <td style="font-weight: 700;">${order.order_number}</td>
+                <td>
+                  <div style="font-weight: 600;">${order.document_name}</div>
+                  ${order.document_download_url ? `<a href="${CONFIG.API_BASE_URL}${order.document_download_url}?token=${AdminAuth.getToken()}" target="_blank" style="font-size: 0.75rem; color: var(--primary);">Download / View File</a>` : ''}
+                </td>
+
+                <td style="font-size: 0.75rem; color: var(--text-secondary);">
+                  ${order.copies}x, ${order.color_mode === 'color' ? 'Color' : 'B&W'}, ${order.paper_size}${order.duplex ? ', Duplex' : ''}
+                </td>
+                <td style="font-weight: 700;">$${order.total_price}</td>
+                <td><span class="badge ${paymentBadge}">${order.payment_status.toUpperCase()}</span></td>
+                <td>
+                  <span class="badge ${statusBadge}">${order.status.replace(/_/g, ' ').toUpperCase()}</span>
+                  ${isBlocked && order.blocked_reason ? `<div style="font-size: 10px; color: var(--error); margin-top: 2px;">${order.blocked_reason}</div>` : ''}
+                </td>
+                <td style="color: var(--text-muted); font-size: 0.75rem;">${new Date(order.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                <td style="text-align: right;">
+                  <div class="d-flex gap-2" style="justify-content: flex-end;">
+                    ${order.payment_status === 'unpaid' && !isBlocked ? `
+                      <button type="button" class="btn btn-success btn-sm btn-pay-ok" data-id="${order.id}">
+                        Pay OK
+                      </button>
+                    ` : ''}
+
+                    ${!isBlocked && order.status !== 'completed' ? `
+                      <button type="button" class="btn btn-primary btn-sm btn-authorize-print" data-id="${order.id}">
+                        Print
+                      </button>
+                    ` : ''}
+
+                    ${!isBlocked ? `
+                      <button type="button" class="btn btn-danger btn-sm btn-block-order" data-id="${order.id}">
+                        Block
+                      </button>
+                    ` : `
+                      <span class="badge badge-blocked">BLOCKED</span>
+                    `}
+                  </div>
+                </td>
+              `;
+              tbody.appendChild(tr);
+            });
+
+            attachActionHandlers();
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Error loading orders.'}</div>`;
+        }
+      }
+
+      function attachActionHandlers() {
+        // 1. Pay OK Action
+        document.querySelectorAll('.btn-pay-ok').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const confirmed = window.confirm('Confirm that you have received cash at the counter for this order?');
+            if (!confirmed) return;
+
+            btn.disabled = true;
+            try {
+              const res = await AdminApi.orders.approvePayment(id);
+              if (res.success) {
+                alertContainer.innerHTML = '<div class="alert alert-success">Cash payment approved. Order verified!</div>';
+                loadOrders(currentFilter);
+              }
+            } catch (err) {
+              alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Payment approval failed.'}</div>`;
+              btn.disabled = false;
+            }
+          });
+        });
+
+        // 2. Authorize Print Action
+        document.querySelectorAll('.btn-authorize-print').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            btn.disabled = true;
+            try {
+              const res = await AdminApi.orders.authorizePrint(id);
+              if (res.success) {
+                alertContainer.innerHTML = '<div class="alert alert-info">Order authorized and routed to shop printer!</div>';
+                loadOrders(currentFilter);
+              }
+            } catch (err) {
+              alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Print authorization failed.'}</div>`;
+              btn.disabled = false;
+            }
+          });
+        });
+
+        // 3. Block Order Action
+        document.querySelectorAll('.btn-block-order').forEach(btn => {
+          btn.addEventListener('click', async () => {
+            const id = btn.dataset.id;
+            const reason = window.prompt('Enter reason for blocking this print order:', 'Inappropriate document or unauthorized submission');
+            if (!reason) return;
+
+            btn.disabled = true;
+            try {
+              const res = await AdminApi.orders.block(id, reason);
+              if (res.success) {
+                alertContainer.innerHTML = '<div class="alert alert-warning">Order has been blocked. Blocked orders cannot be printed.</div>';
+                loadOrders(currentFilter);
+              }
+            } catch (err) {
+              alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Failed to block order.'}</div>`;
+              btn.disabled = false;
+            }
+          });
+        });
+      }
+
+      // Initial load
+      loadOrders();
+    });
+  </script>
+</body>
+</html>

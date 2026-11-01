@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmation — PrintX</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <svg class="navbar-brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        PrintX
+      </a>
+
+      <nav>
+        <ul class="navbar-menu">
+          <li><a href="upload.html" class="navbar-link">Upload Document</a></li>
+          <li><a href="order-tracking.html" class="navbar-link">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div id="navbar-auth-slot" class="navbar-actions"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container-narrow">
+
+      <div id="confirmation-alert-container"></div>
+
+      <!-- Short Receipt / Token Slip Card -->
+      <div id="confirmation-card" class="card text-center" style="max-width: 520px; margin: 0 auto; padding: var(--space-8); border: 2px solid var(--border-subtle); box-shadow: var(--shadow-md);">
+        
+        <!-- Platform Logo & Status -->
+        <div class="navbar-brand justify-center mb-3">
+          <svg class="navbar-brand-icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <path d="M6 14h12v8H6z"/>
+          </svg>
+          PrintX
+        </div>
+
+        <div style="display: inline-flex; align-items: center; justify-content: center; width: 56px; height: 56px; border-radius: 50%; background-color: var(--success-light); color: var(--success); margin: 0 auto var(--space-3) auto;">
+          <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>
+
+        <h2 style="font-size: var(--font-size-xl); margin-bottom: var(--space-1); letter-spacing: 0.5px;">ORDER CONFIRMED</h2>
+        <p class="text-muted" style="font-size: var(--font-size-sm); margin-bottom: var(--space-6);">Your print job has been sent to the counter queue.</p>
+
+        <!-- High-Contrast Token Box -->
+        <div class="card mb-6" style="background-color: var(--bg-subtle); border: 1px dashed var(--border-strong); padding: var(--space-5);">
+          <div class="text-muted font-medium" style="font-size: var(--font-size-xs); letter-spacing: 1px;">SHOW THIS ORDER ID AT COUNTER</div>
+          <div id="receipt-order-id" class="font-bold text-primary mt-1" style="font-size: 2.25rem; font-family: monospace; letter-spacing: 2px;">
+            --
+          </div>
+
+          <div style="border-top: 1px solid var(--border-subtle); margin: var(--space-4) 0; padding-top: var(--space-4);">
+            <div class="d-flex justify-between items-center mb-2" style="font-size: var(--font-size-sm);">
+              <span class="text-muted">Shop Name:</span>
+              <span id="receipt-shop" class="font-bold text-main">-</span>
+            </div>
+            <div class="d-flex justify-between items-center mb-2" style="font-size: var(--font-size-sm);">
+              <span class="text-muted">Document:</span>
+              <span id="receipt-doc" class="font-medium text-main" style="max-width: 240px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">-</span>
+            </div>
+            <div class="d-flex justify-between items-center mb-2" style="font-size: var(--font-size-sm);">
+              <span class="text-muted">Payment:</span>
+              <span id="receipt-payment-method" class="badge badge-pending">Cash on Shop</span>
+            </div>
+            <div class="d-flex justify-between items-center mb-2" style="font-size: var(--font-size-sm);">
+              <span class="text-muted">Status:</span>
+              <span id="receipt-status" class="badge badge-active">Pending at Counter</span>
+            </div>
+            <div class="d-flex justify-between items-center mt-3 pt-3" style="font-size: var(--font-size-sm); border-top: 1px dashed var(--border-subtle);">
+              <span class="text-muted font-medium">Total Payment Due:</span>
+              <span id="receipt-total" class="font-bold text-main" style="font-size: var(--font-size-xl); color: var(--success);">$0.00</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Instruction Alert -->
+        <div class="alert alert-info text-left mb-6" style="font-size: var(--font-size-xs); justify-content: flex-start;">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <div>
+            Please visit the shop print counter, provide your <strong>Order ID</strong>, pay the cash amount, and collect your fresh prints.
+          </div>
+        </div>
+
+        <!-- OK Button -->
+        <button type="button" id="receipt-ok-btn" class="btn btn-primary btn-lg btn-full" style="height: 48px; font-size: var(--font-size-base);">
+          OK (Print Another Document)
+        </button>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border-top: none;">
+      <span>&copy; 2026 PrintX — Online Document Printing Platform</span>
+      <span>Instant QR Counter Slip</span>
+    </div>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.initNavbar('order-confirmation');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const orderId = urlParams.get('orderId');
+      const token = urlParams.get('token') || '';
+      const confirmationCard = document.getElementById('confirmation-card');
+      const alertContainerId = 'confirmation-alert-container';
+
+      let order = null;
+
+      // 1. First priority: Fetch authoritative order directly from Django Backend and PostgreSQL
+      if (orderId) {
+        try {
+          const res = await Api.orders.getById(orderId, token);
+          if (res && res.success && res.data) {
+            order = res.data;
+          }
+        } catch (e) {
+          // If network error or token mismatch, check local receipt draft
+        }
+      }
+
+      // 2. Second priority: Use last order receipt returned by order create API if matching
+      if (!order) {
+        const cached = localStorage.getItem('printx_last_receipt');
+        if (cached) {
+          try {
+            const parsed = JSON.parse(cached);
+            if (!orderId || parsed.order_number === orderId || parsed.id == orderId) {
+              order = parsed;
+            }
+          } catch(e) {}
+        }
+      }
+
+      // 3. If no authentic order exists, display error state (Strictly NO fake or hardcoded orders)
+      if (!order) {
+        confirmationCard.innerHTML = `
+          <div class="alert alert-error mb-4">
+            ${App.ICONS.alert}
+            <div><strong>Order Not Found:</strong> No active print order was located. Please upload a document to create an order.</div>
+          </div>
+          <a href="upload.html" class="btn btn-primary btn-lg btn-full mt-4">
+            Upload Document
+          </a>
+        `;
+        return;
+      }
+
+      // Populate verified PostgreSQL data
+      const orderNumber = order.order_number || order.id || '--';
+      const shopName = order.shop_name || 'Print Shop Counter';
+      const documentName = order.document_name || 'Document.pdf';
+      const paymentMethod = order.payment_method === 'cash_on_pickup' ? 'Cash on Shop' : (order.payment_method || 'Cash on Shop');
+      
+      let statusLabel = 'Pending at Counter';
+      let statusClass = 'badge-pending';
+      if (order.status === 'confirmed') {
+        statusLabel = 'Payment Confirmed';
+        statusClass = 'badge-active';
+      } else if (order.status === 'printing') {
+        statusLabel = 'Printing in Progress';
+        statusClass = 'badge-active';
+      } else if (order.status === 'ready_for_pickup') {
+        statusLabel = 'Ready for Pickup';
+        statusClass = 'badge-success';
+      } else if (order.status === 'completed') {
+        statusLabel = 'Completed';
+        statusClass = 'badge-success';
+      } else if (order.is_blocked || order.status === 'blocked') {
+        statusLabel = 'Blocked';
+        statusClass = 'badge-blocked';
+      }
+
+      document.getElementById('receipt-order-id').textContent = orderNumber;
+      document.getElementById('receipt-shop').textContent = shopName;
+      document.getElementById('receipt-doc').textContent = documentName;
+      document.getElementById('receipt-doc').title = documentName;
+      
+      const paymentEl = document.getElementById('receipt-payment-method');
+      paymentEl.textContent = paymentMethod;
+
+      const statusEl = document.getElementById('receipt-status');
+      statusEl.textContent = statusLabel;
+      statusEl.className = `badge ${statusClass}`;
+
+      document.getElementById('receipt-total').textContent = App.formatCurrency(order.total_price, order.currency || 'USD');
+
+      // "OK" Button Handler -> Clears active upload session and returns directly to upload.html
+      const okBtn = document.getElementById('receipt-ok-btn');
+      if (okBtn) {
+        okBtn.addEventListener('click', () => {
+          localStorage.removeItem(CONFIG.STORAGE_KEYS.CURRENT_UPLOAD);
+          localStorage.removeItem('printx_last_receipt');
+          const targetShop = order.shop_public_id || urlParams.get('shop') || '';
+          const shopQuery = targetShop ? `?shop=${encodeURIComponent(targetShop)}` : '';
+          window.location.href = `upload.html${shopQuery}`;
+        });
+      }
+    });
+  </script>
+</body>
+</html>

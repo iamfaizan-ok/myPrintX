@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Your QR Code — PrintX Admin Hub</title>
+  <link rel="stylesheet" href="../css/admin.css">
+  <style>
+    @media print {
+      body * { visibility: hidden; }
+      #printable-qr-card, #printable-qr-card * { visibility: visible; }
+      #printable-qr-card {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-layout">
+
+    <!-- Sidebar Navigation -->
+    <aside class="admin-sidebar no-print">
+      <div class="sidebar-header">
+        <a href="../index.html" class="sidebar-brand">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+          PrintX Admin
+        </a>
+      </div>
+
+      <ul class="sidebar-menu">
+        <li>
+          <a href="../index.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Dashboard
+          </a>
+        </li>
+        <li>
+          <a href="orders.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            All Order Prints
+          </a>
+        </li>
+        <li>
+          <a href="qr-code.html" class="sidebar-link active">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            Create Your QR Code
+          </a>
+        </li>
+        <li>
+          <a href="profile.html" class="sidebar-link">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            Shop Profile
+          </a>
+        </li>
+      </ul>
+
+      <div class="sidebar-footer">
+        <a href="#" class="sidebar-link action-logout" style="color: #EF4444;">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          Sign Out
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="admin-main">
+      
+      <!-- Topbar -->
+      <header class="admin-topbar no-print">
+        <div class="topbar-shop-badge">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          <span id="topbar-shop-name">My Print Shop</span>
+        </div>
+
+        <div class="topbar-admin-info">
+          <span id="topbar-admin-name" style="font-size: 0.875rem; font-weight: 600; color: var(--text-main);">Shop Admin</span>
+          <button type="button" class="btn btn-secondary btn-sm action-logout">Logout</button>
+        </div>
+      </header>
+
+      <div class="admin-content">
+
+        <div class="page-header no-print">
+          <div>
+            <h1 class="page-title">Shop Counter QR Code</h1>
+            <p class="page-subtitle">Unique cryptographic counter identifier. Place this on your shop counter for walk-in customers.</p>
+          </div>
+          <button type="button" id="generate-qr-btn" class="btn btn-primary">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Re-generate QR Code
+          </button>
+        </div>
+
+        <!-- Alert Container -->
+        <div id="qr-alert-container" class="no-print"></div>
+
+        <!-- Printable QR Stand Card -->
+        <div id="printable-qr-card" class="card text-center" style="max-width: 480px; margin: 0 auto; border: 2px solid var(--border-strong); padding: 36px;">
+          
+          <div style="font-size: 1.5rem; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; margin-bottom: 4px;">
+            PRINTX COUNTER KIOSK
+          </div>
+
+          <h2 id="qr-shop-title" style="font-size: 1.25rem; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">
+            Campus Central Print Hub
+          </h2>
+          
+          <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px;">
+            Public Shop ID: <strong id="qr-shop-id">shp_...</strong>
+          </div>
+
+          <!-- QR Preview Image -->
+          <div class="qr-preview-box">
+            <img id="qr-image" src="" alt="Shop Counter QR Code" class="qr-preview-image">
+            <div style="font-size: 0.875rem; font-weight: 700; color: var(--text-main);">
+              SCAN TO PRINT YOUR FILES
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 4px;">
+              No App or Account Required • Instant Document Upload
+            </div>
+          </div>
+
+          <div style="font-size: 0.75rem; color: var(--text-muted); word-break: break-all; margin-bottom: 24px; background: var(--bg-subtle); padding: 8px 12px; border-radius: var(--radius-sm);">
+            Target URL: <span id="qr-target-url" style="color: var(--primary);">http://localhost:3000/pages/upload.html?shop=...</span>
+          </div>
+
+          <!-- Action Buttons (Hidden when printing paper display) -->
+          <div class="d-flex justify-center gap-4 no-print">
+            <a id="download-qr-btn" href="#" download="Shop_PrintX_QR.png" class="btn btn-secondary">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download PNG
+            </a>
+            <button type="button" id="print-stand-btn" class="btn btn-primary">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v8H6z"/></svg>
+              Print Counter Display
+            </button>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/auth.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (!AdminAuth.requireAdminAuth()) return;
+      AdminAuth.renderSidebar('qr-code');
+
+      const alertContainer = document.getElementById('qr-alert-container');
+      const qrImage = document.getElementById('qr-image');
+      const shopTitle = document.getElementById('qr-shop-title');
+      const shopIdEl = document.getElementById('qr-shop-id');
+      const targetUrlEl = document.getElementById('qr-target-url');
+      const downloadBtn = document.getElementById('download-qr-btn');
+      const generateBtn = document.getElementById('generate-qr-btn');
+      const printStandBtn = document.getElementById('print-stand-btn');
+
+      if (printStandBtn) {
+        printStandBtn.addEventListener('click', () => {
+          window.print();
+        });
+      }
+
+      async function fetchOrGenerateQR(isForce = false) {
+        alertContainer.innerHTML = '';
+        try {
+          const res = isForce ? await AdminApi.qr.getOrCreate() : await AdminApi.qr.getDetails();
+          if (res && res.success && res.data) {
+            const data = res.data;
+            shopTitle.textContent = data.shop_name;
+            shopIdEl.textContent = data.public_id;
+            targetUrlEl.textContent = data.scan_target_url;
+
+            // Full URL to media image on Django backend
+            const imageUrl = data.qr_code_url.startsWith('http') ? data.qr_code_url : `http://localhost:8000${data.qr_code_url}`;
+            qrImage.src = imageUrl;
+            downloadBtn.href = imageUrl;
+            downloadBtn.download = `PrintX_QR_${data.public_id}.png`;
+
+            if (isForce) {
+              alertContainer.innerHTML = '<div class="alert alert-success">QR code regenerated successfully by the Django backend.</div>';
+            }
+          }
+        } catch (err) {
+          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Error retrieving QR code.'}</div>`;
+        }
+      }
+
+      if (generateBtn) {
+        generateBtn.addEventListener('click', () => fetchOrGenerateQR(true));
+      }
+
+      // Initial load
+      fetchOrGenerateQR(false);
+    });
+  </script>
+</body>
+</html>

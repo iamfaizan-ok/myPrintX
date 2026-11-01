@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PrintX — Scan QR & Instant Document Printing</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="index.html" class="navbar-brand">
+        <svg class="navbar-brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        PrintX
+      </a>
+
+      <nav>
+        <ul class="navbar-menu">
+          <li><a href="index.html" class="navbar-link active">Home</a></li>
+          <li><a href="pages/upload.html" class="navbar-link">Upload Document</a></li>
+          <li><a href="pages/order-tracking.html" class="navbar-link">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div id="navbar-auth-slot" class="navbar-actions">
+        <!-- Dynamic shop badge injected by app.js -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Hero Section -->
+      <section class="section-header" style="max-width: 780px; margin-top: var(--space-8); margin-bottom: var(--space-12);">
+        <div class="badge badge-pending mb-3" style="padding: 4px 12px; font-size: 13px;">
+          QR Code Counter Print — No Registration Required
+        </div>
+        <h1>Instant Document Printing at Your Shop Counter</h1>
+        <p class="mt-3" style="font-size: var(--font-size-lg);">
+          Scan the QR code placed at your shop, upload your file directly from your phone or laptop, set your print options, and collect your fresh prints with <strong>Cash on Shop</strong>.
+        </p>
+        <div class="d-flex justify-center gap-4 mt-6">
+          <a href="pages/upload.html" class="btn btn-primary btn-lg">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>
+            </svg>
+            Upload File & Print Now
+          </a>
+          <a href="pages/order-tracking.html" class="btn btn-secondary btn-lg">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            Check Order Status
+          </a>
+        </div>
+      </section>
+
+      <!-- 3 Simple Steps -->
+      <section class="mb-12">
+        <div class="section-header">
+          <h2>How It Works at the Counter</h2>
+          <p>Zero login friction. Four simple steps from scan to paper in hand.</p>
+        </div>
+
+        <div class="grid-4">
+          <div class="card text-center">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+              </svg>
+            </div>
+            <h4 class="card-title mb-2">1. Scan Shop QR</h4>
+            <p class="text-muted" style="font-size: var(--font-size-xs);">Scan the QR code displayed at the print shop counter to open this page instantly.</p>
+          </div>
+
+          <div class="card text-center">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <h4 class="card-title mb-2">2. Upload File</h4>
+            <p class="text-muted" style="font-size: var(--font-size-xs);">Upload your PDF, DOCX, or image up to 50 MB with automatic page counting.</p>
+          </div>
+
+          <div class="card text-center">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+              </svg>
+            </div>
+            <h4 class="card-title mb-2">3. Set & View Price</h4>
+            <p class="text-muted" style="font-size: var(--font-size-xs);">Choose Color / B&W, copies, duplex, and binding with live exact price calculation.</p>
+          </div>
+
+          <div class="card text-center">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+              </svg>
+            </div>
+            <h4 class="card-title mb-2">4. Pay Cash on Shop</h4>
+            <p class="text-muted" style="font-size: var(--font-size-xs);">Get your Order ID token on the short receipt slip and pay cash directly at the counter.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Print Shops Section -->
+      <section class="mb-12">
+        <div class="section-header">
+          <h2>Active Print Hub Counters</h2>
+          <p>Scan the counter QR or choose your location below.</p>
+        </div>
+
+        <div id="home-shops-container" class="grid-2">
+          <div class="card">
+            <div class="d-flex items-center justify-between mb-2">
+              <h4 class="card-title">Campus Central Print Hub</h4>
+              <span class="badge badge-completed">Counter Open</span>
+            </div>
+            <p class="text-muted">104 University Ave, Student Center Bldg B</p>
+            <div class="d-flex items-center justify-between mt-4">
+              <span class="text-muted font-medium" style="font-size: var(--font-size-xs);">Hours: 08:00 - 20:00</span>
+              <a href="pages/upload.html?shop=shp_01" class="btn btn-primary btn-sm">Print Here</a>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="d-flex items-center justify-between mb-2">
+              <h4 class="card-title">North Library Express Print</h4>
+              <span class="badge badge-completed">Counter Open</span>
+            </div>
+            <p class="text-muted">77 Science Hall, 1st Floor</p>
+            <div class="d-flex items-center justify-between mt-4">
+              <span class="text-muted font-medium" style="font-size: var(--font-size-xs);">Hours: 09:00 - 22:00</span>
+              <a href="pages/upload.html?shop=shp_02" class="btn btn-primary btn-sm">Print Here</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border-top: none;">
+      <span>&copy; 2026 PrintX — Instant QR Document Printing Platform</span>
+      <span>No Registration Required • Contactless Kiosk Mode</span>
+    </div>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      App.initNavbar('home');
+
+      try {
+        const res = await Api.shops.list();
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+          const container = document.getElementById('home-shops-container');
+          container.innerHTML = '';
+          res.data.forEach(shop => {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+              <div class="d-flex items-center justify-between mb-2">
+                <h4 class="card-title">${App.escapeHTML(shop.name)}</h4>
+                <span class="badge ${shop.isOpen ? 'badge-completed' : 'badge-cancelled'}">
+                  ${shop.isOpen ? 'Counter Open' : 'Closed'}
+                </span>
+              </div>
+              <p class="text-muted">${App.escapeHTML(shop.address)}</p>
+              <div class="d-flex items-center justify-between mt-4">
+                <span class="text-muted font-medium" style="font-size: var(--font-size-xs);">Hours: ${App.escapeHTML(shop.openingHours || 'All Day')}</span>
+                <a href="pages/upload.html?shop=${encodeURIComponent(shop.id)}" class="btn btn-primary btn-sm">Print Here</a>
+              </div>
+            `;
+            container.appendChild(card);
+          });
+        }
+      } catch (e) {
+        // Fallback display
+      }
+    });
+  </script>
+</body>
+</html>

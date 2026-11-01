@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Print Options & Quotation — PrintX</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container navbar-inner">
+      <a href="../index.html" class="navbar-brand">
+        <svg class="navbar-brand-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+          <path d="M6 14h12v8H6z"/>
+        </svg>
+        PrintX
+      </a>
+
+      <nav>
+        <ul class="navbar-menu">
+          <li><a href="../index.html" class="navbar-link">Home</a></li>
+          <li><a href="upload.html" class="navbar-link active">Upload Document</a></li>
+          <li><a href="order-tracking.html" class="navbar-link">Track Order</a></li>
+        </ul>
+      </nav>
+
+      <div id="navbar-auth-slot" class="navbar-actions"></div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="container">
+
+      <!-- Workflow Progress Tracker -->
+      <div class="workflow-steps">
+        <div class="workflow-connector"></div>
+        <div class="workflow-step completed">
+          <div class="workflow-step-circle">✓</div>
+          <div class="workflow-step-title">Upload File</div>
+        </div>
+        <div class="workflow-step active">
+          <div class="workflow-step-circle">2</div>
+          <div class="workflow-step-title">Print Options</div>
+        </div>
+        <div class="workflow-step">
+          <div class="workflow-step-circle">3</div>
+          <div class="workflow-step-title">Counter Receipt</div>
+        </div>
+      </div>
+
+      <!-- Alert Container -->
+      <div id="print-alert-container"></div>
+
+      <div class="grid-sidebar">
+
+        <!-- Left Column: Form Settings -->
+        <div>
+          <!-- Document Badge -->
+          <div class="card mb-4" style="background-color: var(--bg-subtle);">
+            <div class="d-flex items-center justify-between">
+              <div>
+                <div class="text-muted" style="font-size: var(--font-size-xs);">Active Document</div>
+                <h4 id="doc-name" class="mt-1">Document.pdf</h4>
+                <div class="d-flex gap-4 mt-1 text-muted" style="font-size: var(--font-size-xs);">
+                  <span id="doc-pages">- pages</span>
+                  <span>•</span>
+                  <span id="doc-size">-</span>
+                </div>
+              </div>
+              <a href="upload.html" class="btn btn-secondary btn-sm">Change File</a>
+            </div>
+          </div>
+
+          <!-- Print Settings Card -->
+          <div class="card mb-4">
+            <h3 class="card-title mb-4">Print Specifications</h3>
+
+            <!-- Pickup Location (QR Associated) -->
+            <div class="form-group">
+              <label class="form-label form-label-required" for="shop-select">Print Shop Counter</label>
+              <select id="shop-select" class="form-control" required>
+                <option value="">Campus Central Print Hub</option>
+              </select>
+              <span class="form-hint">Prints will be queued directly at this shop's counter.</span>
+            </div>
+
+            <!-- Copies with Touch Stepper (+/-) -->
+            <div class="form-group">
+              <label class="form-label form-label-required" for="copies-input">Number of Copies</label>
+              <div class="stepper-control">
+                <button type="button" id="copies-decrement" class="stepper-btn" aria-label="Decrease copies">−</button>
+                <input type="number" id="copies-input" class="stepper-input" value="1" min="1" max="500">
+                <button type="button" id="copies-increment" class="stepper-btn" aria-label="Increase copies">+</button>
+              </div>
+              <span class="form-hint">Tap + / − or enter number of copies.</span>
+            </div>
+
+            <!-- Page Range -->
+            <div class="form-group">
+              <label class="form-label">Page Selection</label>
+              <div class="d-flex gap-4 mb-2">
+                <label class="form-check">
+                  <input type="radio" name="pageRangeMode" id="page-range-all" value="all" checked>
+                  <span>All Pages</span>
+                </label>
+                <label class="form-check">
+                  <input type="radio" name="pageRangeMode" id="page-range-custom" value="custom">
+                  <span>Custom Pages</span>
+                </label>
+              </div>
+              <input type="text" id="page-range-custom-input" class="form-control" placeholder="e.g. 1-4, 7, 9-10" disabled>
+              <span class="form-hint">Specify exact pages or leave as "All Pages".</span>
+            </div>
+
+            <!-- Color Mode -->
+            <div class="form-group">
+              <label class="form-label">Color Mode</label>
+              <div class="options-grid">
+                <label>
+                  <input type="radio" name="colorMode" value="bw" class="option-card-input" checked>
+                  <div class="option-card-label">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 0 0 20z"/>
+                    </svg>
+                    <span class="option-card-title">Black & White</span>
+                    <span class="option-card-sub">$0.10 / page</span>
+                  </div>
+                </label>
+
+                <label>
+                  <input type="radio" name="colorMode" value="color" class="option-card-input">
+                  <div class="option-card-label">
+                    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                    </svg>
+                    <span class="option-card-title">Full Color</span>
+                    <span class="option-card-sub">$0.50 / page</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Printing Sides (Duplex) -->
+            <div class="form-group">
+              <label class="form-label">Printing Sides (Duplex)</label>
+              <div class="options-grid">
+                <label>
+                  <input type="radio" name="duplexOption" value="single" class="option-card-input" checked>
+                  <div class="option-card-label">
+                    <span class="option-card-title">Single-Sided</span>
+                    <span class="option-card-sub">1 page per sheet</span>
+                  </div>
+                </label>
+
+                <label>
+                  <input type="radio" name="duplexOption" value="double" class="option-card-input">
+                  <div class="option-card-label">
+                    <span class="option-card-title">Double-Sided</span>
+                    <span class="option-card-sub">Back to back (10% off)</span>
+                  </div>
+                </label>
+              </div>
+              <input type="checkbox" id="duplex-checkbox" class="d-none">
+            </div>
+
+            <!-- Binding -->
+            <div class="form-group">
+              <label class="form-label">Finishing & Binding</label>
+              <div class="options-grid">
+                <label>
+                  <input type="radio" name="binding" value="none" class="option-card-input" checked>
+                  <div class="option-card-label">
+                    <span class="option-card-title">No Binding</span>
+                    <span class="option-card-sub">Loose sheets</span>
+                  </div>
+                </label>
+
+                <label>
+                  <input type="radio" name="binding" value="staple" class="option-card-input">
+                  <div class="option-card-label">
+                    <span class="option-card-title">Corner Staple</span>
+                    <span class="option-card-sub">+$0.50</span>
+                  </div>
+                </label>
+
+                <label>
+                  <input type="radio" name="binding" value="spiral" class="option-card-input">
+                  <div class="option-card-label">
+                    <span class="option-card-title">Spiral Bound</span>
+                    <span class="option-card-sub">+$3.00</span>
+                  </div>
+                </label>
+
+                <label>
+                  <input type="radio" name="binding" value="hardcover" class="option-card-input">
+                  <div class="option-card-label">
+                    <span class="option-card-title">Hardcover</span>
+                    <span class="option-card-sub">+$8.00</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Special Instructions -->
+            <div class="form-group mb-0">
+              <label class="form-label" for="special-instructions">Special Instructions (Optional)</label>
+              <textarea id="special-instructions" class="form-control" placeholder="e.g. Please staple top-left corner, urgent pickup."></textarea>
+            </div>
+
+          </div>
+
+          <!-- Payment Options Card -->
+          <div class="card">
+            <h3 class="card-title mb-3">Select Payment Method</h3>
+            
+            <div class="grid-2">
+              <label>
+                <input type="radio" name="paymentOption" id="payment-cash" value="cash" class="option-card-input" checked>
+                <div class="option-card-label" style="text-align: left; padding: var(--space-4);">
+                  <div class="d-flex items-center gap-2 mb-1">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/>
+                    </svg>
+                    <span class="font-semibold text-main">Cash on Shop</span>
+                  </div>
+                  <div class="text-muted" style="font-size: var(--font-size-xs);">Pay cash at the shop counter upon collecting your prints.</div>
+                </div>
+              </label>
+
+              <label>
+                <input type="radio" name="paymentOption" id="payment-online" value="online" class="option-card-input">
+                <div class="option-card-label" style="text-align: left; padding: var(--space-4); position: relative;">
+                  <span class="badge badge-warning" style="position: absolute; top: 8px; right: 8px; font-size: 10px;">Coming Soon</span>
+                  <div class="d-flex items-center gap-2 mb-1">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/>
+                    </svg>
+                    <span class="font-semibold text-main">Online Payment</span>
+                  </div>
+                  <div class="text-muted" style="font-size: var(--font-size-xs);">Card / UPI / Mobile banking (will be enabled in next update).</div>
+                </div>
+              </label>
+            </div>
+
+            <div id="online-payment-notice" class="alert alert-info mt-3 d-none">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+              </svg>
+              <div>Online payment gateway is scheduled for integration. Please select <strong>Cash on Shop</strong> to print your document immediately.</div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right Column: Sticky Summary & Instant Order Button -->
+        <div>
+          <div class="card" style="position: sticky; top: 88px;">
+            <h3 class="card-title mb-4">Price Summary</h3>
+            
+            <ul class="summary-list">
+              <li class="summary-item">
+                <span>Selected Pages:</span>
+                <span id="price-selected-pages" class="font-medium">-</span>
+              </li>
+              <li class="summary-item">
+                <span>Print Subtotal:</span>
+                <span id="price-pages-subtotal" class="font-medium">$0.00</span>
+              </li>
+              <li class="summary-item">
+                <span>Binding Fee:</span>
+                <span id="price-binding-fee" class="font-medium">$0.00</span>
+              </li>
+              <li class="summary-item">
+                <span>Tax:</span>
+                <span id="price-tax" class="font-medium">$0.00</span>
+              </li>
+              <li class="summary-item total">
+                <span>Total Due:</span>
+                <span id="price-total" class="text-primary font-bold" style="font-size: var(--font-size-2xl);">$0.00</span>
+              </li>
+            </ul>
+
+            <button type="button" id="place-order-btn" class="btn btn-primary btn-full btn-lg mt-6">
+              Confirm & Get Order Token
+            </button>
+            <p class="text-muted text-center mt-2" style="font-size: var(--font-size-xs);">
+              Instant queue submission. Pay in cash at the counter.
+            </p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-bottom" style="border-top: none;">
+      <span>&copy; 2026 PrintX Inc. All rights reserved.</span>
+      <span>Instant QR Counter Print Workflow</span>
+    </div>
+  </footer>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/api.js"></script>
+  <script src="../js/app.js"></script>
+  <script src="../js/print.js"></script>
+
+</body>
+</html>
