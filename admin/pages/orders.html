@@ -212,13 +212,13 @@
                   <div class="d-flex gap-2" style="justify-content: flex-end;">
                     ${order.payment_status === 'unpaid' && !isBlocked ? `
                       <button type="button" class="btn btn-success btn-sm btn-pay-ok" data-id="${order.id}">
-                        Pay OK
+                        Pay OK (Print)
                       </button>
                     ` : ''}
 
-                    ${!isBlocked && order.status !== 'completed' ? `
-                      <button type="button" class="btn btn-primary btn-sm btn-authorize-print" data-id="${order.id}">
-                        Print
+                    ${order.payment_status === 'paid' && !isBlocked && order.status !== 'completed' ? `
+                      <button type="button" class="btn btn-secondary btn-sm btn-authorize-print" data-id="${order.id}" title="Re-queue print job if needed">
+                        Reprint
                       </button>
                     ` : ''}
 

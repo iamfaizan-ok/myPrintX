@@ -145,6 +145,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     r.addEventListener('change', recalculatePrice);
   });
 
+  const onlineNotice = document.getElementById('online-payment-notice');
+  document.querySelectorAll('input[name="paymentOption"]').forEach(r => {
+    r.addEventListener('change', () => {
+      if (onlineNotice) {
+        if (r.value === 'online') {
+          onlineNotice.classList.remove('d-none');
+        } else {
+          onlineNotice.classList.add('d-none');
+        }
+      }
+    });
+  });
+
   function getPrintSettings() {
     const copies = parseInt(copiesInput.value, 10) || 1;
     let pageRange = 'all';
@@ -215,6 +228,14 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       if (!latestBreakdown) {
         App.showAlert(alertContainerId, 'Please check your print options.');
+        return;
+      }
+
+      const paymentRadio = document.querySelector('input[name="paymentOption"]:checked');
+      const isOnlinePayment = paymentRadio && paymentRadio.value === 'online';
+
+      if (isOnlinePayment) {
+        App.showAlert(alertContainerId, 'Online payment gateway integration is currently pending. Please select "Cash on Shop" to confirm your order and print immediately.');
         return;
       }
 

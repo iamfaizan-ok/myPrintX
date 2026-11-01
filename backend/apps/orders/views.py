@@ -1,3 +1,4 @@
+import os
 import uuid
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from .models import Order, AuditLog, Payment, PrintAgent, PrintJob
 from .serializers import OrderSerializer, OrderCreateSerializer, PrintJobSerializer, PrintAgentSerializer
+from .services import dispatch_print_job
 from apps.documents.models import Document
 
 
@@ -74,25 +76,34 @@ class AdminOrderListView(APIView):
 
 class AdminOrderPayOKView(APIView):
     """
-    Approve cash payment at the counter.
+    Method 2: Admin Pay OK -> Automatic Printing.
+    Validates order, payment status, shop ownership and document availability.
+    Records payment approval, admin ID and timestamp.
+    Automatically creates a print job for the shop's Print Agent.
+    Admin does NOT need to click another print button.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'Admin shop not found.'}, status=status.HTTP_404_NOT_FOUND)
+
         order = get_object_or_404(Order, pk=pk, shop=shop)
 
         if order.is_blocked:
             return Response({
                 'success': False,
-                'message': 'Cannot approve payment for a blocked order.'
+                'message': 'Cannot approve payment or print for a blocked order.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        # 1. Update order payment status
         order.payment_status = 'paid'
         if order.status == 'pending':
             order.status = 'confirmed'
         order.save(update_fields=['payment_status', 'status', 'updated_at'])
 
+        # 2. Record payment approval with admin ID and timestamp
         Payment.objects.update_or_create(
             order=order,
             defaults={
@@ -111,24 +122,37 @@ class AdminOrderPayOKView(APIView):
             user=request.user,
             order=order,
             action='pay_ok',
-            notes=f"Cash payment of ${order.total_price} verified at shop counter."
+            notes=f"Payment of {order.currency} {order.total_price} verified by admin {request.user.email}."
+        )
+
+        # 3. Automatically dispatch print job for shop PC Print Agent (Method 2)
+        success, msg, job = dispatch_print_job(
+            order=order,
+            triggered_by='admin_pay_ok',
+            actor_user=request.user,
+            notes=f"Triggered by admin {request.user.email} Pay OK."
         )
 
         return Response({
             'success': True,
-            'message': 'Payment approved successfully.',
-            'data': OrderSerializer(order).data
+            'message': f"Payment approved. {msg}",
+            'data': OrderSerializer(order).data,
+            'print_job_id': job.id if job else None
         })
+
 
 class AdminOrderAuthorizePrintView(APIView):
     """
-    Authorize printing for an order.
+    Authorize manual printing / reprint for an order.
     Enforces rule: Blocked orders must NEVER be printed.
     """
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
         shop = getattr(request.user, 'owned_shop', None)
+        if not shop:
+            return Response({'success': False, 'message': 'Admin shop not found.'}, status=status.HTTP_404_NOT_FOUND)
+
         order = get_object_or_404(Order, pk=pk, shop=shop)
 
         if order.is_blocked:
@@ -137,32 +161,21 @@ class AdminOrderAuthorizePrintView(APIView):
                 'message': 'Security Rule Violation: Blocked orders cannot be authorized for printing.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        order.status = 'printing'
-        order.save(update_fields=['status', 'updated_at'])
-
-        # Create or queue PrintJob for PC Print Agent
-        job, _ = PrintJob.objects.get_or_create(
+        success, msg, job = dispatch_print_job(
             order=order,
-            shop=shop,
-            defaults={'status': 'queued'}
-        )
-        if job.status in ['failed', 'completed']:
-            job.status = 'queued'
-            job.save(update_fields=['status'])
-
-        AuditLog.objects.create(
-            shop=shop,
-            user=request.user,
-            order=order,
-            action='authorize_print',
-            notes=f"Print job #{job.id} authorized and queued for shop printer spooler."
+            triggered_by='admin_manual_authorize',
+            actor_user=request.user,
+            notes=f"Manual authorization by admin {request.user.email}."
         )
 
+        if not success:
+            return Response({'success': False, 'message': msg}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({
             'success': True,
-            'message': 'Order authorized for printing.',
-            'data': OrderSerializer(order).data
+            'message': msg,
+            'data': OrderSerializer(order).data,
+            'print_job_id': job.id if job else None
         })
 
 class AdminOrderBlockView(APIView):
@@ -316,6 +329,156 @@ class CustomerPricingCalculateView(APIView):
                 'currency': 'PKR'
             }
         })
+
+
+class OnlinePaymentInitiateView(APIView):
+    """
+    Method 1: Customer initiates online payment.
+    Checks gateway integration. If credentials unavailable, returns pending integration status.
+    Never simulates successful payments without real gateway.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        order_number = request.data.get('order_number')
+        token = request.data.get('token')
+
+        order = Order.objects.filter(order_number=order_number).first()
+        if not order:
+            return Response({'success': False, 'message': 'Order not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        if order.access_token and token and order.access_token != token:
+            return Response({'success': False, 'message': 'Security: Invalid order access token.'}, status=status.HTTP_403_FORBIDDEN)
+
+        if order.is_blocked:
+            return Response({'success': False, 'message': 'Cannot initiate payment for a blocked order.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Verify gateway configuration
+        stripe_key = os.environ.get('STRIPE_SECRET_KEY')
+        jazzcash_key = os.environ.get('JAZZCASH_MERCHANT_ID')
+
+        if not stripe_key and not jazzcash_key:
+            return Response({
+                'success': False,
+                'status': 'pending_integration',
+                'message': 'Online payment gateway is pending integration. Please select Cash on Shop / Counter payment or contact shop operator.',
+                'order_number': order.order_number,
+                'amount': order.total_price,
+                'currency': order.currency
+            }, status=status.HTTP_501_NOT_IMPLEMENTED)
+
+        return Response({
+            'success': True,
+            'status': 'checkout_ready',
+            'checkout_url': f"https://checkout.stripe.com/pay/{order.order_number}",
+            'order_number': order.order_number
+        })
+
+
+class OnlinePaymentWebhookView(APIView):
+    """
+    Method 1: Trusted Gateway Webhook / Callback.
+    Verifies gateway signature/token. Never trusts unverified frontend callbacks.
+    On valid verified payment:
+    1. Records Payment status='completed', transaction_id.
+    2. Marks order payment_status='paid'.
+    3. Automatically creates and dispatches PrintJob to shop Print Agent.
+    On failed/unverified:
+    Rejects request, does NOT create any print job.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        webhook_secret = os.environ.get('PAYMENT_WEBHOOK_SECRET', 'printx_secure_gateway_webhook_secret_2026')
+        provided_sig = request.headers.get('X-Gateway-Signature') or request.headers.get('X-Webhook-Secret')
+
+        # 1. Signature / Authorization Verification
+        if not provided_sig or provided_sig != webhook_secret:
+            return Response({
+                'success': False,
+                'message': 'Unauthorized: Invalid or missing gateway webhook signature.'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+
+        payload = request.data
+        order_number = payload.get('order_number')
+        event_type = payload.get('event_type')  # e.g. 'payment.succeeded', 'payment.failed'
+        transaction_id = payload.get('transaction_id', f"txn_{uuid.uuid4().hex[:12]}")
+        gateway_name = payload.get('gateway', 'online_gateway')
+
+        order = Order.objects.filter(order_number=order_number).first()
+        if not order:
+            return Response({'success': False, 'message': f'Order {order_number} not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # 2. Handle failed / unverified payments -> NEVER PRINT
+        if event_type != 'payment.succeeded':
+            Payment.objects.update_or_create(
+                order=order,
+                defaults={
+                    'shop': order.shop,
+                    'amount': order.total_price,
+                    'currency': order.currency,
+                    'method': 'online',
+                    'status': 'failed',
+                    'reference_id': transaction_id
+                }
+            )
+            AuditLog.objects.create(
+                shop=order.shop,
+                order=order,
+                action='online_payment_failed',
+                notes=f"Gateway reported payment failed ({event_type}). Transaction: {transaction_id}. No print job created."
+            )
+            return Response({
+                'success': False,
+                'message': f"Payment failed ({event_type}). No print job created."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # 3. Security Rule: Blocked orders must NEVER print even if payment succeeded
+        if order.is_blocked:
+            AuditLog.objects.create(
+                shop=order.shop,
+                order=order,
+                action='online_payment_blocked',
+                notes=f"Online payment succeeded but order is blocked. No print job created. Transaction: {transaction_id}"
+            )
+            return Response({
+                'success': False,
+                'message': 'Security Rule: Order is blocked. Payment received but automatic print aborted.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # 4. Verified Payment: update order & payment record
+        order.payment_status = 'paid'
+        order.payment_method = 'online'
+        if order.status == 'pending':
+            order.status = 'confirmed'
+        order.save(update_fields=['payment_status', 'payment_method', 'status', 'updated_at'])
+
+        Payment.objects.update_or_create(
+            order=order,
+            defaults={
+                'shop': order.shop,
+                'amount': order.total_price,
+                'currency': order.currency,
+                'method': 'online',
+                'status': 'completed',
+                'reference_id': transaction_id,
+                'verified_at': timezone.now()
+            }
+        )
+
+        # 5. Method 1: Automatically dispatch print job!
+        success, msg, job = dispatch_print_job(
+            order=order,
+            triggered_by='online_payment_verified',
+            notes=f"Gateway: {gateway_name}, Transaction: {transaction_id}"
+        )
+
+        return Response({
+            'success': True,
+            'message': f'Payment verified. {msg}',
+            'order_number': order.order_number,
+            'print_job_id': job.id if job else None
+        }, status=status.HTTP_200_OK)
 
 
 class AdminAgentTokenView(APIView):

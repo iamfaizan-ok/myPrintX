@@ -12,7 +12,8 @@ from apps.orders.views import (
     AdminDashboardStatsView, AdminOrderListView, AdminOrderPayOKView, 
     AdminOrderAuthorizePrintView, AdminOrderBlockView,
     CustomerOrderCreateView, CustomerOrderTrackView, CustomerPricingCalculateView,
-    AdminAgentTokenView, AgentPollJobsView, AgentUpdateJobStatusView
+    AdminAgentTokenView, AgentPollJobsView, AgentUpdateJobStatusView,
+    OnlinePaymentInitiateView, OnlinePaymentWebhookView
 )
 
 urlpatterns = [
@@ -56,6 +57,10 @@ urlpatterns = [
     path('api/v1/orders/create/', CustomerOrderCreateView.as_view(), name='customer_order_create'),
     path('api/v1/orders/track/<str:order_identifier>/', CustomerOrderTrackView.as_view(), name='customer_order_track'),
     path('api/v1/pricing/calculate/', CustomerPricingCalculateView.as_view(), name='customer_pricing_calculate'),
+
+    # 7. Online Payment Gateways (Method 1: Webhook & Initiation)
+    path('api/v1/payments/online/initiate/', OnlinePaymentInitiateView.as_view(), name='online_payment_initiate'),
+    path('api/v1/payments/online/webhook/', OnlinePaymentWebhookView.as_view(), name='online_payment_webhook'),
 ]
 
 if settings.DEBUG:
