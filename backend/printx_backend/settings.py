@@ -64,7 +64,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'printx_backend.wsgi.application'
 
-# Database Configuration: PostgreSQL only (Mandatory)
+# Database Configuration: PostgreSQL with seamless SQLite fallback
 import dj_database_url
 
 database_url = os.environ.get("DATABASE_URL")
@@ -75,12 +75,8 @@ if database_url:
 else:
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.environ.get("DB_NAME", "Printx"),
-            "USER": os.environ.get("DB_USER", "postgres"),
-            "PASSWORD": os.environ.get("DB_PASSWORD", ""),
-            "HOST": os.environ.get("DB_HOST", "localhost"),
-            "PORT": os.environ.get("DB_PORT", "5432"),
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
