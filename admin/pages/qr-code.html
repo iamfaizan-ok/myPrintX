@@ -101,6 +101,20 @@
         <!-- Alert Container -->
         <div id="qr-alert-container" class="no-print"></div>
 
+        <!-- QR Scan URL Settings (no-print) -->
+        <div class="card mb-4 no-print" style="max-width: 480px; margin: 0 auto 20px auto; padding: 18px 24px; border: 1px solid var(--border-subtle); background: var(--bg-surface);">
+          <label class="form-label font-semibold" for="custom-frontend-url" style="display: block; margin-bottom: 6px; font-size: 0.875rem;">
+            Customer Upload URL (Embedded in QR):
+          </label>
+          <div class="d-flex gap-2">
+            <input type="text" id="custom-frontend-url" class="form-control" style="font-size: 0.85rem;" placeholder="e.g. http://10.240.172.1:3000/pages/upload.html">
+            <button type="button" id="apply-url-btn" class="btn btn-secondary btn-sm" style="white-space: nowrap;">Update URL</button>
+          </div>
+          <div class="text-muted mt-2" style="font-size: 0.75rem; line-height: 1.4;">
+            <strong>Pro Tip:</strong> For Wi-Fi mobile scanning, use your computer's IP (e.g. <code>http://&lt;your-ip&gt;:3000</code>). When live in production, enter your public domain.
+          </div>
+        </div>
+
         <!-- Printable QR Stand Card -->
         <div id="printable-qr-card" class="card text-center" style="max-width: 480px; margin: 0 auto; border: 2px solid var(--border-strong); padding: 36px;">
           
@@ -167,6 +181,27 @@
       const downloadBtn = document.getElementById('download-qr-btn');
       const generateBtn = document.getElementById('generate-qr-btn');
       const printStandBtn = document.getElementById('print-stand-btn');
+      const customUrlInput = document.getElementById('custom-frontend-url');
+      const applyUrlBtn = document.getElementById('apply-url-btn');
+
+      // Auto-populate recommended URL based on current host
+      const currentHost = window.location.hostname;
+      const defaultHostUrl = (currentHost === 'localhost' || currentHost === '127.0.0.1')
+        ? `http://${currentHost}:3000/pages/upload.html`
+        : `${window.location.protocol}//${window.location.host}/pages/upload.html`;
+
+      const savedUrl = localStorage.getItem('printx_custom_qr_url') || defaultHostUrl;
+      if (customUrlInput) customUrlInput.value = savedUrl;
+
+      if (applyUrlBtn) {
+        applyUrlBtn.addEventListener('click', () => {
+          const val = customUrlInput.value.trim();
+          if (val) {
+            localStorage.setItem('printx_custom_qr_url', val);
+            fetchOrGenerateQR(true);
+          }
+        });
+      }
 
       if (downloadBtn) {
         downloadBtn.addEventListener('click', async (e) => {
@@ -198,21 +233,29 @@
       async function fetchOrGenerateQR(isForce = false) {
         alertContainer.innerHTML = '';
         try {
-          const res = isForce ? await AdminApi.qr.getOrCreate() : await AdminApi.qr.getDetails();
+          const frontendUrl = customUrlInput ? customUrlInput.value.trim() : '';
+          const res = isForce 
+            ? await AdminApi.qr.getOrCreate({ frontend_url: frontendUrl }) 
+            : await AdminApi.qr.getDetails(frontendUrl);
+
           if (res && res.success && res.data) {
             const data = res.data;
             shopTitle.textContent = data.shop_name;
             shopIdEl.textContent = data.public_id;
             targetUrlEl.textContent = data.scan_target_url;
 
-            // Full URL to media image on Django backend
-            const imageUrl = data.qr_code_url.startsWith('http') ? data.qr_code_url : `http://localhost:8000${data.qr_code_url}`;
+            // Resolve backend image origin dynamically
+            const backendOrigin = CONFIG.API_BASE_URL.replace(/\/api\/v1\/?$/, '');
+            const imageUrl = data.qr_code_url.startsWith('http') 
+              ? data.qr_code_url 
+              : `${backendOrigin}${data.qr_code_url}`;
+
             qrImage.src = imageUrl;
             downloadBtn.href = imageUrl;
             downloadBtn.download = `PrintX_QR_${data.public_id}.png`;
 
             if (isForce) {
-              alertContainer.innerHTML = '<div class="alert alert-success">QR code regenerated successfully by the Django backend.</div>';
+              alertContainer.innerHTML = '<div class="alert alert-success">QR code regenerated successfully with the updated URL.</div>';
             }
           }
         } catch (err) {

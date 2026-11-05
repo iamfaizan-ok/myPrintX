@@ -26,10 +26,13 @@ class Shop(models.Model):
     def __str__(self):
         return f"{self.name} ({self.public_id})"
 
-    def generate_qr_code(self, base_url='http://localhost:3000/pages/upload.html'):
+    def generate_qr_code(self, base_url=None):
         """
         Generates and saves a high-resolution PNG QR code pointing directly to the customer upload page for this shop.
         """
+        import os
+        if not base_url:
+            base_url = os.environ.get('CUSTOMER_FRONTEND_URL', 'http://localhost:3000/pages/upload.html')
         target_url = f"{base_url}?shop={self.public_id}"
         
         qr = qrcode.QRCode(

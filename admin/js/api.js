@@ -110,8 +110,11 @@ const AdminApi = (function() {
     },
 
     qr: {
-      getOrCreate: () => AdminApi.post('/admin/qr/generate/', {}),
-      getDetails: () => AdminApi.get('/admin/qr/details/')
+      getOrCreate: (data = {}) => AdminApi.post('/admin/qr/generate/', data),
+      getDetails: (frontendUrl = '') => {
+        const query = frontendUrl ? `?frontend_url=${encodeURIComponent(frontendUrl)}` : '';
+        return AdminApi.get(`/admin/qr/details/${query}`);
+      }
     },
 
     shop: {

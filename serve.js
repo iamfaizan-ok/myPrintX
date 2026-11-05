@@ -123,6 +123,23 @@ const server = http.createServer((req, res) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`PrintX Frontend & Admin Hub running at http://localhost:${PORT}`);
+const os = require('os');
+
+function getLanIp() {
+  const interfaces = os.networkInterfaces();
+  for (const name of Object.keys(interfaces)) {
+    for (const iface of interfaces[name]) {
+      if (iface.family === 'IPv4' && !iface.internal) {
+        return iface.address;
+      }
+    }
+  }
+  return '127.0.0.1';
+}
+
+server.listen(PORT, '0.0.0.0', () => {
+  const lanIp = getLanIp();
+  console.log(`PrintX Frontend & Admin Hub running:`);
+  console.log(`  > Local:   http://localhost:${PORT}`);
+  console.log(`  > Network: http://${lanIp}:${PORT} (For Mobile Testing on same Wi-Fi)`);
 });
