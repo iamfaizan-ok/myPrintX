@@ -25,9 +25,21 @@ class AdminSignupView(APIView):
                     'shop': ShopSerializer(result['shop']).data if result['shop'] else None
                 }
             }, status=status.HTTP_201_CREATED)
+        # Extract the exact human-readable field error
+        error_details = []
+        for field, err_list in serializer.errors.items():
+            err_msg = err_list[0] if isinstance(err_list, list) and err_list else str(err_list)
+            if field == 'non_field_errors':
+                error_details.append(err_msg)
+            else:
+                field_name = field.replace('_', ' ').capitalize()
+                error_details.append(f"{field_name}: {err_msg}")
+
+        user_friendly_message = error_details[0] if error_details else 'Registration failed. Please check the entered information.'
+
         return Response({
             'success': False,
-            'message': 'Registration failed. Please check the entered information.',
+            'message': user_friendly_message,
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 

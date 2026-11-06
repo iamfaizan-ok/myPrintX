@@ -48,9 +48,14 @@ const AdminApi = (function() {
       }
 
       if (!response.ok) {
-        let msg = (result && (result.message || result.detail || result.error));
+        let msg = null;
 
-        // 1. Check for nested DRF 'errors' object
+        // 1. If backend returned a specific error message, use it
+        if (result && result.message && !result.message.startsWith('Registration failed. Please check')) {
+          msg = result.message;
+        }
+
+        // 2. Check for nested DRF 'errors' object to get the exact field reason
         if (!msg && result && result.errors) {
           if (typeof result.errors === 'string') {
             msg = result.errors;
@@ -58,12 +63,14 @@ const AdminApi = (function() {
             const errKeys = Object.keys(result.errors);
             if (errKeys.length > 0) {
               const errVal = result.errors[errKeys[0]];
-              msg = Array.isArray(errVal) ? errVal[0] : String(errVal);
+              const firstErr = Array.isArray(errVal) ? errVal[0] : String(errVal);
+              const fieldName = errKeys[0] !== 'non_field_errors' ? `${errKeys[0].replace(/_/g, ' ')}: ` : '';
+              msg = `${fieldName}${firstErr}`;
             }
           }
         }
 
-        // 2. Fallback: extract from other fields, skipping boolean 'success'
+        // 3. Fallback: extract from other fields, skipping boolean 'success'
         if (!msg && result && typeof result === 'object') {
           const keys = Object.keys(result).filter(k => k !== 'success');
           if (keys.length > 0) {
@@ -72,7 +79,7 @@ const AdminApi = (function() {
           }
         }
 
-        const err = new Error(msg || 'Invalid email address or password. Please verify your credentials.');
+        const err = new Error(msg || (result && (result.message || result.detail || result.error)) || 'Request could not be processed. Please verify your input.');
         err.status = response.status;
         err.data = result;
         throw err;

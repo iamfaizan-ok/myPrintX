@@ -154,10 +154,7 @@
             throw new Error((res && res.message) || 'Registration failed.');
           }
         } catch (err) {
-          let errorMsg = err.message || '';
-          if (!errorMsg || errorMsg.includes('success: false') || errorMsg.includes('Request failed')) {
-            errorMsg = 'Registration could not be completed. Please check the entered details.';
-          }
+          const errorMsg = err.message || 'Registration could not be completed. Please check the entered details.';
           alertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
           submitBtn.disabled = false;
           submitBtn.textContent = 'Register Shop & Generate Account';
