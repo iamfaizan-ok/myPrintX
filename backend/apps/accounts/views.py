@@ -35,7 +35,7 @@ def format_drf_errors(errors_dict) -> str:
 
 class AdminSignupRequestOTPView(APIView):
     """
-    Step 1: Validates registration information and sends a 6-digit OTP code to the admin's email.
+    Step 1: Validates registration information and sends a 4-digit OTP code to the admin's email.
     """
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
@@ -48,7 +48,7 @@ class AdminSignupRequestOTPView(APIView):
                 res = create_signup_otp(serializer.validated_data)
                 return Response({
                     'success': True,
-                    'message': f"A 6-digit verification code has been dispatched to {res['email']}.",
+                    'message': f"A 4-digit verification code has been dispatched to {res['email']}.",
                     'data': res
                 }, status=status.HTTP_200_OK)
             except ValueError as val_err:

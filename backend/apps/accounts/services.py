@@ -8,9 +8,9 @@ from rest_framework.authtoken.models import Token
 from .models import User, SignupOTP
 from apps.shops.models import Shop
 
-def generate_secure_otp(length=6) -> str:
+def generate_secure_otp(length=4) -> str:
     """
-    Generates a cryptographically strong 6-digit numeric OTP.
+    Generates a cryptographically strong 4-digit numeric OTP.
     """
     return "".join(str(random.randint(0, 9)) for _ in range(length))
 
@@ -22,7 +22,7 @@ def send_otp_email(email: str, otp_code: str) -> bool:
     subject = "PrintX — Your Shop Admin Verification Code"
     message = (
         f"Hello,\n\n"
-        f"Your verification code for registering your PrintX Shop Admin account is:\n\n"
+        f"Your 4-digit verification code for registering your PrintX Shop Admin account is:\n\n"
         f"    {otp_code}\n\n"
         f"This code will expire in 10 minutes.\n"
         f"If you did not request this verification, please safely ignore this email.\n\n"
@@ -51,7 +51,7 @@ def send_otp_email(email: str, otp_code: str) -> bool:
 
 def create_signup_otp(validated_data: dict) -> dict:
     """
-    Validates email uniqueness, stages registration data, generates 6-digit OTP,
+    Validates email uniqueness, stages registration data, generates 4-digit OTP,
     and sends it to the target email.
     """
     email = validated_data['email'].lower()
@@ -59,7 +59,7 @@ def create_signup_otp(validated_data: dict) -> dict:
     if User.objects.filter(email__iexact=email).exists():
         raise ValueError("An account with this email address already exists. Please sign in instead.")
 
-    otp_code = generate_secure_otp(6)
+    otp_code = generate_secure_otp(4)
     expires_at = timezone.now() + timedelta(minutes=10)
 
     # Invalidate any existing unverified OTPs for this email
@@ -83,7 +83,7 @@ def create_signup_otp(validated_data: dict) -> dict:
 
 def resend_signup_otp(email: str) -> dict:
     """
-    Generates a new OTP for an existing staged signup session.
+    Generates a new 4-digit OTP for an existing staged signup session.
     """
     email = email.strip().lower()
 
@@ -91,7 +91,7 @@ def resend_signup_otp(email: str) -> dict:
     if not otp_record:
         raise ValueError("No active registration found for this email. Please fill out the signup form.")
 
-    new_otp = generate_secure_otp(6)
+    new_otp = generate_secure_otp(4)
     otp_record.otp_code = new_otp
     otp_record.expires_at = timezone.now() + timedelta(minutes=10)
     otp_record.save(update_fields=['otp_code', 'expires_at'])
@@ -166,3 +166,4 @@ def verify_and_complete_signup(email: str, entered_otp: str) -> dict:
         'user': user,
         'shop': shop
     }
+

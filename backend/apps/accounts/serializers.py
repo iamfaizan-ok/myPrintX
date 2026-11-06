@@ -40,10 +40,10 @@ class AdminVerifyOTPSerializer(serializers.Serializer):
     Validates OTP submission from the short verification screen.
     """
     email = serializers.EmailField(error_messages={'required': 'Email address is required.'})
-    otp = serializers.CharField(min_length=6, max_length=6, error_messages={
-        'required': 'Please enter the 6-digit verification code.',
-        'min_length': 'Verification code must be exactly 6 digits.',
-        'max_length': 'Verification code must be exactly 6 digits.'
+    otp = serializers.CharField(min_length=4, max_length=4, error_messages={
+        'required': 'Please enter the 4-digit verification code.',
+        'min_length': 'Verification code must be exactly 4 digits.',
+        'max_length': 'Verification code must be exactly 4 digits.'
     })
 
     def validate_email(self, value):

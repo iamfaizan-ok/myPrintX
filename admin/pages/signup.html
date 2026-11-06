@@ -167,7 +167,7 @@
         </div>
         <h2 style="font-size: 1.25rem; font-weight: 700;">Verify Your Email</h2>
         <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
-          We sent a 6-digit verification code to<br>
+          We sent a 4-digit verification code to<br>
           <span id="otp-target-email" class="otp-target-email"></span>
         </p>
       </div>
@@ -178,22 +178,23 @@
       <form id="otp-form" autocomplete="off">
         <div class="form-group text-center" style="margin-bottom: 20px;">
           <label class="form-label" for="otp-code-input" style="font-weight: 600; margin-bottom: 8px;">
-            Enter 6-Digit Verification Code
+            Enter 4-Digit Verification Code
           </label>
           <input 
             type="text" 
             id="otp-code-input" 
             class="otp-input-box" 
-            maxlength="6" 
+            maxlength="4" 
             pattern="[0-9]*" 
             inputmode="numeric" 
             autocomplete="one-time-code"
-            placeholder="••••••" 
+            placeholder="••••" 
             required
             autofocus
+            style="max-width: 260px; margin: 0 auto; letter-spacing: 16px;"
           >
           <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
-            Valid for 10 minutes. Check your inbox and spam folder.
+            Valid for 10 minutes.
           </small>
         </div>
 
@@ -384,8 +385,8 @@
         otpAlertContainer.innerHTML = '';
 
         const otp = otpInput.value.trim();
-        if (!otp || otp.length !== 6) {
-          otpAlertContainer.innerHTML = '<div class="alert alert-error">Please enter the complete 6-digit verification code.</div>';
+        if (!otp || otp.length !== 4) {
+          otpAlertContainer.innerHTML = '<div class="alert alert-error">Please enter the complete 4-digit verification code.</div>';
           otpInput.focus();
           return;
         }
