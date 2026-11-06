@@ -4,7 +4,14 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 # Views
-from apps.accounts.views import AdminSignupView, AdminLoginView, AdminMeView, AdminLogoutView
+from apps.accounts.views import (
+    AdminSignupRequestOTPView,
+    AdminSignupVerifyOTPView,
+    AdminSignupResendOTPView,
+    AdminLoginView,
+    AdminMeView,
+    AdminLogoutView
+)
 from apps.shops.views import PublicShopDetailView, PublicShopListView, AdminShopProfileView, AdminQRGenerateView, AdminQRDetailsView
 from apps.documents.views import DocumentUploadView, DocumentDetailView, DocumentDownloadView
 
@@ -19,8 +26,10 @@ from apps.orders.views import (
 urlpatterns = [
     path('admin-panel/', admin.site.urls),
 
-    # 1. Admin Authentication
-    path('api/v1/admin/auth/signup/', AdminSignupView.as_view(), name='admin_signup'),
+    # 1. Admin Authentication with OTP Verification
+    path('api/v1/admin/auth/signup/', AdminSignupRequestOTPView.as_view(), name='admin_signup_request_otp'),
+    path('api/v1/admin/auth/signup/verify-otp/', AdminSignupVerifyOTPView.as_view(), name='admin_signup_verify_otp'),
+    path('api/v1/admin/auth/signup/resend-otp/', AdminSignupResendOTPView.as_view(), name='admin_signup_resend_otp'),
     path('api/v1/admin/auth/login/', AdminLoginView.as_view(), name='admin_login'),
     path('api/v1/admin/auth/me/', AdminMeView.as_view(), name='admin_me'),
     path('api/v1/admin/auth/logout/', AdminLogoutView.as_view(), name='admin_logout'),

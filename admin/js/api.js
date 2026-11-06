@@ -103,6 +103,8 @@ const AdminApi = (function() {
 
     auth: {
       signup: (data) => AdminApi.post('/admin/auth/signup/', data),
+      verifyOTP: (email, otp) => AdminApi.post('/admin/auth/signup/verify-otp/', { email, otp }),
+      resendOTP: (email) => AdminApi.post('/admin/auth/signup/resend-otp/', { email }),
       login: (credentials) => AdminApi.post('/admin/auth/login/', credentials),
       getProfile: () => AdminApi.get('/admin/auth/me/'),
       updateProfile: (data) => AdminApi.patch('/admin/auth/me/', data),

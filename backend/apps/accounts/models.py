@@ -56,3 +56,25 @@ class Customer(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.phone or self.email or 'Walk-in'})"
+
+
+class SignupOTP(models.Model):
+    """
+    Stores 6-digit OTP verification codes and staged signup data for new shop admins.
+    """
+    email = models.EmailField(db_index=True)
+    otp_code = models.CharField(max_length=6)
+    registration_payload = models.JSONField(help_text="Staged signup payload until OTP is confirmed")
+    is_verified = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() > self.expires_at
+
+    def __str__(self):
+        return f"OTP for {self.email} ({'Verified' if self.is_verified else 'Pending'})"

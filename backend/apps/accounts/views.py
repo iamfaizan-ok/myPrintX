@@ -4,44 +4,151 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.authtoken.models import Token
-from .serializers import AdminSignupSerializer, AdminLoginSerializer, UserSerializer
+from .serializers import (
+    AdminSignupRequestSerializer,
+    AdminVerifyOTPSerializer,
+    AdminResendOTPSerializer,
+    AdminLoginSerializer,
+    UserSerializer
+)
+from .services import (
+    create_signup_otp,
+    resend_signup_otp,
+    verify_and_complete_signup
+)
 from apps.shops.serializers import ShopSerializer
 
-class AdminSignupView(APIView):
+def format_drf_errors(errors_dict) -> str:
+    """
+    Extracts the first user-friendly error message from DRF validation errors dictionary.
+    """
+    if not errors_dict:
+        return 'Invalid request data.'
+    for field, err_list in errors_dict.items():
+        err_msg = err_list[0] if isinstance(err_list, list) and err_list else str(err_list)
+        if field == 'non_field_errors':
+            return str(err_msg)
+        field_name = field.replace('_', ' ').capitalize()
+        return f"{field_name}: {err_msg}"
+    return 'Invalid request data.'
+
+
+class AdminSignupRequestOTPView(APIView):
+    """
+    Step 1: Validates registration information and sends a 6-digit OTP code to the admin's email.
+    """
     permission_classes = [AllowAny]
     throttle_classes = [ScopedRateThrottle]
     throttle_scope = 'login'
 
     def post(self, request):
-        serializer = AdminSignupSerializer(data=request.data)
+        serializer = AdminSignupRequestSerializer(data=request.data)
         if serializer.is_valid():
-            result = serializer.save()
-            return Response({
-                'success': True,
-                'message': 'Shop and admin account created successfully.',
-                'data': {
-                    'token': result['token'],
-                    'user': UserSerializer(result['user']).data,
-                    'shop': ShopSerializer(result['shop']).data if result['shop'] else None
-                }
-            }, status=status.HTTP_201_CREATED)
-        # Extract the exact human-readable field error
-        error_details = []
-        for field, err_list in serializer.errors.items():
-            err_msg = err_list[0] if isinstance(err_list, list) and err_list else str(err_list)
-            if field == 'non_field_errors':
-                error_details.append(err_msg)
-            else:
-                field_name = field.replace('_', ' ').capitalize()
-                error_details.append(f"{field_name}: {err_msg}")
-
-        user_friendly_message = error_details[0] if error_details else 'Registration failed. Please check the entered information.'
+            try:
+                res = create_signup_otp(serializer.validated_data)
+                return Response({
+                    'success': True,
+                    'message': f"A 6-digit verification code has been dispatched to {res['email']}.",
+                    'data': res
+                }, status=status.HTTP_200_OK)
+            except ValueError as val_err:
+                return Response({
+                    'success': False,
+                    'message': str(val_err)
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({
+                    'success': False,
+                    'message': 'Unable to send verification code. Please check your email address and try again.'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({
             'success': False,
-            'message': user_friendly_message,
+            'message': format_drf_errors(serializer.errors),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminSignupVerifyOTPView(APIView):
+    """
+    Step 2: Verifies the 6-digit OTP code. If correct, creates the User & Shop accounts in PostgreSQL,
+    generates the authentication token, and completes registration.
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
+
+    def post(self, request):
+        serializer = AdminVerifyOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            otp = serializer.validated_data['otp']
+
+            try:
+                result = verify_and_complete_signup(email, otp)
+                return Response({
+                    'success': True,
+                    'message': 'Account and shop registered successfully! Welcome to PrintX.',
+                    'data': {
+                        'token': result['token'],
+                        'user': UserSerializer(result['user']).data,
+                        'shop': ShopSerializer(result['shop']).data if result['shop'] else None
+                    }
+                }, status=status.HTTP_201_CREATED)
+            except ValueError as val_err:
+                return Response({
+                    'success': False,
+                    'message': str(val_err)
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({
+                    'success': False,
+                    'message': f"Registration verification failed: {str(e)}"
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'success': False,
+            'message': format_drf_errors(serializer.errors),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AdminSignupResendOTPView(APIView):
+    """
+    Resends a fresh 6-digit verification code to the user's email with cooldown support.
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'login'
+
+    def post(self, request):
+        serializer = AdminResendOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                res = resend_signup_otp(email)
+                return Response({
+                    'success': True,
+                    'message': f"A fresh verification code has been dispatched to {email}.",
+                    'data': res
+                }, status=status.HTTP_200_OK)
+            except ValueError as val_err:
+                return Response({
+                    'success': False,
+                    'message': str(val_err)
+                }, status=status.HTTP_400_BAD_REQUEST)
+            except Exception as e:
+                return Response({
+                    'success': False,
+                    'message': 'Unable to resend verification code. Please try again in a moment.'
+                }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        return Response({
+            'success': False,
+            'message': format_drf_errors(serializer.errors),
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
@@ -63,9 +170,10 @@ class AdminLoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response({
             'success': False,
-            'message': 'Invalid email address or password. Please verify your credentials.',
+            'message': format_drf_errors(serializer.errors),
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
+
 
 class AdminMeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -117,12 +225,12 @@ class AdminMeView(APIView):
             }
         })
 
+
 class AdminLogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            # Delete user token on logout for security
             Token.objects.filter(user=request.user).delete()
         except Exception:
             pass

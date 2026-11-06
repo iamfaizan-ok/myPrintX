@@ -5,85 +5,222 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shop Owner Registration — PrintX Admin Hub</title>
   <link rel="stylesheet" href="/admin/css/admin.css">
+  <style>
+    .auth-card {
+      max-width: 560px;
+      width: 100%;
+      margin: 0 auto;
+      box-shadow: var(--shadow-md);
+      transition: all 0.2s ease-in-out;
+    }
+    .otp-input-box {
+      width: 100%;
+      height: 52px;
+      letter-spacing: 12px;
+      font-size: 1.75rem;
+      font-weight: 700;
+      text-align: center;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: var(--primary-dark);
+      background-color: var(--bg-surface);
+      border: 2px solid var(--border-strong);
+      border-radius: var(--radius-md);
+      outline: none;
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+    .otp-input-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px var(--primary-light);
+    }
+    .otp-target-email {
+      color: var(--primary);
+      font-weight: 600;
+      word-break: break-all;
+    }
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--primary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 4px 8px;
+      text-decoration: underline;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-link:hover {
+      color: var(--primary-hover);
+    }
+    .btn-link:disabled {
+      color: var(--text-muted);
+      cursor: not-allowed;
+      text-decoration: none;
+    }
+    .step-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background-color: var(--primary);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: var(--radius-full);
+      margin-right: 6px;
+    }
+  </style>
 </head>
-<body style="background-color: var(--bg-subtle); display: flex; align-items: center; justify-content: center; padding: 40px 16px;">
+<body style="background-color: var(--bg-subtle); display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 40px 16px;">
 
-  <div class="card" style="max-width: 560px; width: 100%; margin: 0 auto; box-shadow: var(--shadow-md);">
+  <div class="card auth-card">
     
-    <div class="text-center mb-4">
-      <div class="sidebar-brand justify-center" style="color: var(--primary); font-size: 1.5rem; justify-content: center;">
-        <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
-          <path d="M6 14h12v8H6z"/>
-        </svg>
-        Welcome to PrintX
-      </div>
-      <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">For Shop Owners — Register</h2>
-      <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">
-        Use PrintX for easy shop management and save your valuable time.
-      </p>
-    </div>
-
-    <!-- Alert Container -->
-    <div id="signup-alert-container"></div>
-
-    <form id="signup-form">
-      <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">
-        1. Shop Owner Credentials
+    <!-- STEP 1: Registration Form -->
+    <div id="step-signup-form">
+      <div class="text-center mb-4">
+        <div class="sidebar-brand justify-center" style="color: var(--primary); font-size: 1.5rem; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+            <path d="M6 14h12v8H6z"/>
+          </svg>
+          Welcome to PrintX
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">For Shop Owners — Register</h2>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">
+          Use PrintX for easy shop management and save your valuable time.
+        </p>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" for="owner_name">Owner Full Name *</label>
-        <input type="text" id="owner_name" class="form-control" placeholder="Enter full name" required>
-      </div>
+      <!-- Alert Container -->
+      <div id="signup-alert-container"></div>
 
-      <div class="form-group">
-        <label class="form-label" for="email">Business Email Address *</label>
-        <input type="email" id="email" class="form-control" placeholder="Enter business email" required>
-      </div>
+      <form id="signup-form" autocomplete="on">
+        <div style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; margin-bottom: 12px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px; display: flex; align-items: center;">
+          <span class="step-badge">1</span> Shop Owner Credentials
+        </div>
 
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <div class="form-group">
-          <label class="form-label" for="password">Password *</label>
-          <div style="position: relative;">
-            <input type="password" id="password" class="form-control" placeholder="Min. 6 chars" required minlength="6">
-            <button type="button" id="toggle-pw" style="position: absolute; right: 10px; top: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.75rem;">Show</button>
+          <label class="form-label" for="owner_name">Owner Full Name *</label>
+          <input type="text" id="owner_name" class="form-control" placeholder="Enter full name" autocomplete="name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="email">Business Email Address *</label>
+          <input type="email" id="email" class="form-control" placeholder="owner@printshop.com" autocomplete="email" required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div class="form-group">
+            <label class="form-label" for="password">Password *</label>
+            <div style="position: relative;">
+              <input type="password" id="password" class="form-control" placeholder="Min. 6 chars" required minlength="6" autocomplete="new-password">
+              <button type="button" id="toggle-pw" style="position: absolute; right: 10px; top: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 0.75rem;">Show</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="confirm_password">Confirm Password *</label>
+            <input type="password" id="confirm_password" class="form-control" placeholder="Re-enter password" required minlength="6" autocomplete="new-password">
           </div>
         </div>
 
+        <div style="font-size: 0.8125rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; margin: 20px 0 12px 0; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px; display: flex; align-items: center;">
+          <span class="step-badge">2</span> Print Shop Information
+        </div>
+
         <div class="form-group">
-          <label class="form-label" for="confirm_password">Confirm Password *</label>
-          <input type="password" id="confirm_password" class="form-control" placeholder="Re-enter password" required minlength="6">
+          <label class="form-label" for="shop_name">Shop / Business Name *</label>
+          <input type="text" id="shop_name" class="form-control" placeholder="e.g. Apex Fast Prints" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="shop_phone">Shop Contact Phone *</label>
+          <input type="tel" id="shop_phone" class="form-control" placeholder="e.g. +92 300 1234567" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="shop_address">Shop Physical Address *</label>
+          <input type="text" id="shop_address" class="form-control" placeholder="e.g. Counter 14, Commercial Plaza" required>
+        </div>
+
+        <button type="submit" id="submit-signup-btn" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 0.95rem; margin-top: 16px;">
+          Continue &amp; Send Verification Code
+        </button>
+      </form>
+
+      <div class="text-center mt-4" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
+        <span style="font-size: 0.875rem; color: var(--text-secondary);">Already have an admin account?</span>
+        <a href="/admin/pages/login.html" style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin-left: 6px;">Sign In Here</a>
+      </div>
+    </div>
+
+    <!-- STEP 2: Email Verification (OTP Screen) -->
+    <div id="step-otp-verification" class="d-none">
+      <div class="text-center mb-4">
+        <div style="width: 56px; height: 56px; margin: 0 auto 12px auto; background-color: var(--primary-light); color: var(--primary); border-radius: var(--radius-full); display: flex; align-items: center; justify-content: center;">
+          <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+            <polyline points="22,6 12,13 2,6"></polyline>
+          </svg>
+        </div>
+        <h2 style="font-size: 1.25rem; font-weight: 700;">Verify Your Email</h2>
+        <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 6px; line-height: 1.4;">
+          We sent a 6-digit verification code to<br>
+          <span id="otp-target-email" class="otp-target-email"></span>
+        </p>
+      </div>
+
+      <!-- OTP Alert Container -->
+      <div id="otp-alert-container"></div>
+
+      <form id="otp-form" autocomplete="off">
+        <div class="form-group text-center" style="margin-bottom: 20px;">
+          <label class="form-label" for="otp-code-input" style="font-weight: 600; margin-bottom: 8px;">
+            Enter 6-Digit Verification Code
+          </label>
+          <input 
+            type="text" 
+            id="otp-code-input" 
+            class="otp-input-box" 
+            maxlength="6" 
+            pattern="[0-9]*" 
+            inputmode="numeric" 
+            autocomplete="one-time-code"
+            placeholder="••••••" 
+            required
+            autofocus
+          >
+          <small style="display: block; color: var(--text-muted); font-size: 0.75rem; margin-top: 8px;">
+            Valid for 10 minutes. Check your inbox and spam folder.
+          </small>
+        </div>
+
+        <button type="submit" id="submit-otp-btn" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 0.95rem;">
+          Verify Code &amp; Complete Registration
+        </button>
+      </form>
+
+      <div class="text-center mt-4" style="border-top: 1px solid var(--border-subtle); padding-top: 16px; display: flex; flex-direction: column; align-items: center; gap: 8px;">
+        <div>
+          <span style="font-size: 0.875rem; color: var(--text-secondary);">Didn't receive the code?</span>
+          <button type="button" id="resend-otp-btn" class="btn-link">
+            Resend Code
+          </button>
+        </div>
+        <div id="resend-timer-box" style="font-size: 0.8125rem; color: var(--text-muted);"></div>
+
+        <div style="margin-top: 8px;">
+          <button type="button" id="back-to-signup-btn" class="btn-link" style="color: var(--text-secondary); font-size: 0.8125rem;">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="19" y1="12" x2="5" y2="12"></line>
+              <polyline points="12 19 5 12 12 5"></polyline>
+            </svg>
+            Back / Change Email or Information
+          </button>
         </div>
       </div>
-
-      <div style="font-size: 0.875rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.5px; margin: 20px 0 12px 0; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;">
-        2. Print Shop Information
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="shop_name">Shop / Business Name *</label>
-        <input type="text" id="shop_name" class="form-control" placeholder="Enter shop name" required>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="shop_phone">Shop Contact Phone *</label>
-        <input type="tel" id="shop_phone" class="form-control" placeholder="e.g. +92 300 1234567" required>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label" for="shop_address">Shop Physical Address *</label>
-        <input type="text" id="shop_address" class="form-control" placeholder="Enter shop address" required>
-      </div>
-
-      <button type="submit" id="submit-signup-btn" class="btn btn-primary" style="width: 100%; height: 44px; font-size: 0.95rem; margin-top: 16px;">
-        Register Shop & Generate Account
-      </button>
-    </form>
-
-    <div class="text-center mt-4" style="border-top: 1px solid var(--border-subtle); padding-top: 16px;">
-      <span style="font-size: 0.875rem; color: var(--text-secondary);">Already have an admin account?</span>
-      <a href="/admin/pages/login.html" style="font-size: 0.875rem; font-weight: 600; color: var(--primary); margin-left: 6px;">Sign In Here</a>
     </div>
 
   </div>
@@ -93,17 +230,37 @@
   <script src="/admin/js/auth.js"></script>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+      // If already logged in, redirect to admin dashboard
       if (AdminAuth.isAuthenticated()) {
         window.location.href = '/admin/index.html';
         return;
       }
 
-      const form = document.getElementById('signup-form');
-      const submitBtn = document.getElementById('submit-signup-btn');
-      const alertContainer = document.getElementById('signup-alert-container');
+      // Step 1 Elements
+      const stepSignup = document.getElementById('step-signup-form');
+      const signupForm = document.getElementById('signup-form');
+      const submitSignupBtn = document.getElementById('submit-signup-btn');
+      const signupAlertContainer = document.getElementById('signup-alert-container');
       const togglePw = document.getElementById('toggle-pw');
       const pwInput = document.getElementById('password');
 
+      // Step 2 Elements
+      const stepOtp = document.getElementById('step-otp-verification');
+      const otpForm = document.getElementById('otp-form');
+      const otpInput = document.getElementById('otp-code-input');
+      const submitOtpBtn = document.getElementById('submit-otp-btn');
+      const otpAlertContainer = document.getElementById('otp-alert-container');
+      const otpTargetEmail = document.getElementById('otp-target-email');
+      const resendBtn = document.getElementById('resend-otp-btn');
+      const resendTimerBox = document.getElementById('resend-timer-box');
+      const backToSignupBtn = document.getElementById('back-to-signup-btn');
+
+      // State
+      let pendingEmail = '';
+      let cooldownTimer = null;
+      let cooldownRemaining = 0;
+
+      // Password visibility toggle
       if (togglePw && pwInput) {
         togglePw.addEventListener('click', () => {
           if (pwInput.type === 'password') {
@@ -116,9 +273,69 @@
         });
       }
 
-      form.addEventListener('submit', async (e) => {
+      // Restrict OTP input to numbers only
+      otpInput.addEventListener('input', (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      });
+
+      // Start Resend Cooldown
+      function startCooldown(seconds = 60) {
+        clearInterval(cooldownTimer);
+        cooldownRemaining = seconds;
+        resendBtn.disabled = true;
+        updateCooldownDisplay();
+
+        cooldownTimer = setInterval(() => {
+          cooldownRemaining -= 1;
+          if (cooldownRemaining <= 0) {
+            clearInterval(cooldownTimer);
+            resendBtn.disabled = false;
+            resendBtn.textContent = 'Resend Code';
+            resendTimerBox.textContent = '';
+          } else {
+            updateCooldownDisplay();
+          }
+        }, 1000);
+      }
+
+      function updateCooldownDisplay() {
+        resendBtn.textContent = 'Resend Code';
+        resendTimerBox.textContent = `Available in ${cooldownRemaining}s`;
+      }
+
+      // Switch to Step 2 (OTP View)
+      function showOtpScreen(email) {
+        pendingEmail = email;
+        otpTargetEmail.textContent = email;
+        signupAlertContainer.innerHTML = '';
+        otpAlertContainer.innerHTML = '';
+        otpInput.value = '';
+
+        stepSignup.classList.add('d-none');
+        stepOtp.classList.remove('d-none');
+        otpInput.focus();
+
+        startCooldown(60);
+      }
+
+      // Switch back to Step 1 (Edit info)
+      function showSignupScreen() {
+        clearInterval(cooldownTimer);
+        otpAlertContainer.innerHTML = '';
+        signupAlertContainer.innerHTML = '';
+
+        stepOtp.classList.add('d-none');
+        stepSignup.classList.remove('d-none');
+      }
+
+      backToSignupBtn.addEventListener('click', () => {
+        showSignupScreen();
+      });
+
+      // Handle Step 1 Submit (Request OTP)
+      signupForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        alertContainer.innerHTML = '';
+        signupAlertContainer.innerHTML = '';
 
         const name = document.getElementById('owner_name').value.trim();
         const email = document.getElementById('email').value.trim();
@@ -129,12 +346,12 @@
         const shop_address = document.getElementById('shop_address').value.trim();
 
         if (password !== confirm_password) {
-          alertContainer.innerHTML = '<div class="alert alert-error">Passwords do not match. Please re-enter.</div>';
+          signupAlertContainer.innerHTML = '<div class="alert alert-error">Passwords do not match. Please re-enter.</div>';
           return;
         }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Registering Shop...';
+        submitSignupBtn.disabled = true;
+        submitSignupBtn.textContent = 'Sending Verification Code...';
 
         try {
           const res = await AdminApi.auth.signup({
@@ -147,19 +364,75 @@
             shop_address
           });
 
-          if (res && res.success && res.data) {
-            AdminAuth.setSession(res.data.token, res.data.user, res.data.shop);
-            window.location.href = '/admin/index.html';
+          if (res && res.success) {
+            showOtpScreen(email);
           } else {
-            throw new Error((res && res.message) || 'Registration failed.');
+            throw new Error((res && res.message) || 'Registration request failed.');
           }
         } catch (err) {
           const errorMsg = err.message || 'Registration could not be completed. Please check the entered details.';
-          alertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Register Shop & Generate Account';
+          signupAlertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
+        } finally {
+          submitSignupBtn.disabled = false;
+          submitSignupBtn.textContent = 'Continue & Send Verification Code';
         }
       });
+
+      // Handle Step 2 Submit (Verify OTP)
+      otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        otpAlertContainer.innerHTML = '';
+
+        const otp = otpInput.value.trim();
+        if (!otp || otp.length !== 6) {
+          otpAlertContainer.innerHTML = '<div class="alert alert-error">Please enter the complete 6-digit verification code.</div>';
+          otpInput.focus();
+          return;
+        }
+
+        submitOtpBtn.disabled = true;
+        submitOtpBtn.textContent = 'Verifying Code...';
+
+        try {
+          const res = await AdminApi.auth.verifyOTP(pendingEmail, otp);
+
+          if (res && res.success && res.data) {
+            AdminAuth.setSession(res.data.token, res.data.user, res.data.shop);
+            otpAlertContainer.innerHTML = '<div class="alert alert-success">Verification successful! Redirecting to shop dashboard...</div>';
+            
+            setTimeout(() => {
+              window.location.href = '/admin/index.html';
+            }, 800);
+          } else {
+            throw new Error((res && res.message) || 'Verification failed.');
+          }
+        } catch (err) {
+          const errorMsg = err.message || 'Invalid or expired verification code. Please check and try again.';
+          otpAlertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
+          submitOtpBtn.disabled = false;
+          submitOtpBtn.textContent = 'Verify Code & Complete Registration';
+          otpInput.select();
+        }
+      });
+
+      // Handle Resend OTP
+      resendBtn.addEventListener('click', async () => {
+        if (!pendingEmail || resendBtn.disabled) return;
+
+        otpAlertContainer.innerHTML = '';
+        resendBtn.disabled = true;
+
+        try {
+          const res = await AdminApi.auth.resendOTP(pendingEmail);
+          otpAlertContainer.innerHTML = `<div class="alert alert-success">${escapeHTML((res && res.message) || 'A fresh verification code has been dispatched to your email.')}</div>`;
+          startCooldown(60);
+        } catch (err) {
+          const errorMsg = err.message || 'Unable to resend verification code. Please try again.';
+          otpAlertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
+          resendBtn.disabled = false;
+        }
+      });
+
     });
   </script>
 </body>
