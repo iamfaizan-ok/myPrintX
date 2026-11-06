@@ -27,6 +27,7 @@ class AdminSignupView(APIView):
             }, status=status.HTTP_201_CREATED)
         return Response({
             'success': False,
+            'message': 'Registration failed. Please check the entered information.',
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 
@@ -50,6 +51,7 @@ class AdminLoginView(APIView):
             }, status=status.HTTP_200_OK)
         return Response({
             'success': False,
+            'message': 'Invalid email address or password. Please verify your credentials.',
             'errors': serializer.errors
         }, status=status.HTTP_400_BAD_REQUEST)
 

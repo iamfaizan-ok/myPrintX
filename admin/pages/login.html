@@ -16,11 +16,11 @@
           <path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
           <path d="M6 14h12v8H6z"/>
         </svg>
-        PrintX Multi-Shop
+        Welcome to PrintX
       </div>
-      <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">Shop Admin Sign In</h2>
+      <h2 style="font-size: 1.25rem; font-weight: 700; margin-top: 8px;">For Shop Owners — Sign In</h2>
       <p style="font-size: 0.875rem; color: var(--text-muted); margin-top: 4px;">
-        Access your print order queue, shop analytics, and QR code manager.
+        Use PrintX for easy shop management and save your valuable time.
       </p>
     </div>
 
@@ -105,7 +105,11 @@
             throw new Error((res && res.message) || 'Invalid login response.');
           }
         } catch (err) {
-          alertContainer.innerHTML = `<div class="alert alert-error">${err.message || 'Incorrect email or password.'}</div>`;
+          let errorMsg = err.message || '';
+          if (!errorMsg || errorMsg.includes('success: false') || errorMsg.includes('Request failed')) {
+            errorMsg = 'Invalid email address or password. Please verify your credentials.';
+          }
+          alertContainer.innerHTML = `<div class="alert alert-error">${escapeHTML(errorMsg)}</div>`;
           submitBtn.disabled = false;
           submitBtn.textContent = 'Sign In to Shop Dashboard';
         }

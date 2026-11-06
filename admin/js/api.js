@@ -49,15 +49,30 @@ const AdminApi = (function() {
 
       if (!response.ok) {
         let msg = (result && (result.message || result.detail || result.error));
-        if (!msg && result && typeof result === 'object') {
-          // Flatten field errors from Django REST framework
-          const keys = Object.keys(result);
-          if (keys.length > 0) {
-            const first = result[keys[0]];
-            msg = Array.isArray(first) ? `${keys[0]}: ${first[0]}` : `${keys[0]}: ${first}`;
+
+        // 1. Check for nested DRF 'errors' object
+        if (!msg && result && result.errors) {
+          if (typeof result.errors === 'string') {
+            msg = result.errors;
+          } else if (typeof result.errors === 'object') {
+            const errKeys = Object.keys(result.errors);
+            if (errKeys.length > 0) {
+              const errVal = result.errors[errKeys[0]];
+              msg = Array.isArray(errVal) ? errVal[0] : String(errVal);
+            }
           }
         }
-        const err = new Error(msg || `Request failed with status ${response.status}`);
+
+        // 2. Fallback: extract from other fields, skipping boolean 'success'
+        if (!msg && result && typeof result === 'object') {
+          const keys = Object.keys(result).filter(k => k !== 'success');
+          if (keys.length > 0) {
+            const first = result[keys[0]];
+            msg = Array.isArray(first) ? first[0] : String(first);
+          }
+        }
+
+        const err = new Error(msg || 'Invalid email address or password. Please verify your credentials.');
         err.status = response.status;
         err.data = result;
         throw err;
